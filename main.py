@@ -16,5 +16,7 @@ print(i2c.scan())
 mcp = MCP23017(i2c, 0x20)
 
 mcp.mode = 0x0000
-mcp.portb.gpio = 0b00001100
-mcp.porta.gpio = 0b00101000
+mcp.portb.gpio = 0b00001111
+
+# cant understand why, portA4 enables display 4 on or off
+mcp.porta.gpio = 0b11111000
