@@ -16,5 +16,5 @@ print(i2c.scan())
 mcp = MCP23017(i2c, 0x20)
 
 mcp.mode = 0x0000
-mcp.portb.gpio = 0x01
-mcp.porta.gpio = 0xffff
+mcp.portb.gpio = 0b00001100
+mcp.porta.gpio = 0b00101000
