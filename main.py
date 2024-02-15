@@ -1,5 +1,6 @@
 from machine import Pin, Timer, I2C
 from mcp23017 import MCP23017
+from adc import ADC
 import time
 
 zero = 	0b11101110
@@ -32,6 +33,10 @@ i2c1 = I2C(1,scl=Pin(15), sda=Pin(14))
 addresses = i2c1.scan()
 print('i2c1 device on address:')
 print(hex(addresses[0]) if len(addresses) > 0 else 'no addresses found')
+
+adc = ADC(i2c1)
+print(bin(adc.read_config()))
+
 
 i2c0 = I2C(0,scl=Pin(9), sda=Pin(8))
 addresses = i2c0.scan()
@@ -144,6 +149,10 @@ tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
 
 while(True):
     encoderValue = readEncoderValue()
+    val = adc.read_value()
+    voltage = adc.val_to_voltage(val)
+    
+    print("ADC Value:", val, "Voltage: {:.3f} V".format(voltage))
     
     number2display(encoderValue)
     
