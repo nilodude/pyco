@@ -1,20 +1,10 @@
 from machine import Pin, Timer, I2C
 from mcp23017 import MCP23017
 from adc import ADC
+from numbers import number
 import time
 
-zero = 	0b11101110
-one = 	0b00101000
-two = 	0b11011010
-three = 0b01111010
-four= 	0b00111100
-five= 	0b01110110
-six = 	0b11110110
-seven = 0b00101010
-eight = 0b11111110
-nine = 	0b00111110
 
-number = [zero, one, two, three,four,five, six, seven, eight,nine]
 displays = [0b00000001,0b00000010,0b00000100,0b00001000]
 led = Pin("LED", Pin.OUT)
 tim = Timer()
@@ -35,8 +25,6 @@ print('i2c1 device on address:')
 print(hex(addresses[0]) if len(addresses) > 0 else 'no addresses found')
 
 adc = ADC(i2c1)
-print(bin(adc.read_config()))
-
 
 i2c0 = I2C(0,scl=Pin(9), sda=Pin(8))
 addresses = i2c0.scan()
@@ -63,10 +51,8 @@ def readEncoderValue():
     if(currCLK != lastCLK and currCLK == 1):
         if(dt != currCLK):
             counter -= 1
-#             number2display(counter)
         else:
             counter += 1
-#             number2display(counter)
     
     lastCLK = clk_encoder.value()
     
@@ -87,7 +73,6 @@ def selectNumber(n):
 def tick(timer):
     global led
     global mcp
-    mcp.portb.gpio ^= 0b00010000
     led.toggle()
 
 def sleep(t=0.00095):
@@ -146,15 +131,15 @@ def number2display(n):
 
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
 
-
 while(True):
     encoderValue = readEncoderValue()
     val = adc.read_value()
     voltage = adc.val_to_voltage(val)
     
-    print("ADC Value:", val, "Voltage: {:.3f} V".format(voltage))
+    formattedVoltage = "{:d}".format(int(voltage*1000))
+    print("ADC Value:", val, formattedVoltage)
     
-    number2display(encoderValue)
+    number2display(formattedVoltage)
     
     mcp.gpio = 0x0fff
     
