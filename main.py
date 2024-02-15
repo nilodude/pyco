@@ -50,8 +50,8 @@ def readEncoderValue():
     
     lastCLK = clk_encoder.value()
     
-#     counter = 0 if counter == 10 else counter
-#     counter = 9 if counter == -1 else counter
+    counter = 0 if counter == 10000 else counter
+    counter = 9999 if counter == -1 else counter
     
     return counter
 
