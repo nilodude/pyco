@@ -30,14 +30,15 @@ addresses = i2c1.scan()
 print('i2c1 device on address:')
 print(hex(addresses[0]) if len(addresses) > 0 else 'no addresses found')
 
-adc = ADC(i2c1)
+
 
 i2c0 = I2C(0,scl=Pin(9), sda=Pin(8))
 addresses = i2c0.scan()
 print('i2c0 devices on address:')
 for a in addresses:
     print(hex(a))
-# print(hex(addresses[0]) if len(addresses) > 0 else 'no addresses found')
+
+adc = ADC(i2c0)
 
 mcp1 = MCP23017(i2c0, 0x20)
 
