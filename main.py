@@ -100,9 +100,17 @@ def tick(timer):
 def sleep(t=0.00095):
     time.sleep(t)
 
+def rev(s):
+    r = ""
+    for c in s:
+        r = c+r
+    return r
+
 def number2display(n):
-    s = str(n)
+    s = rev(str(n))
+    
     digits = len(s)
+    
     mcp1.porta.gpio = 0xff
     
     if(digits == 1):
@@ -111,16 +119,16 @@ def number2display(n):
         sleep()
         mcp1.porta.gpio = 0xff
     elif(digits == 2):
-        selectDisplay(3)
+        selectDisplay(4)
         selectNumber(int(s[0]))
         sleep()
         mcp1.porta.gpio = 0xff
-        selectDisplay(4)
+        selectDisplay(3)
         selectNumber(int(s[1]))
         sleep()
         mcp1.porta.gpio = 0xff
     elif(digits == 3):
-        selectDisplay(2)
+        selectDisplay(4)
         selectNumber(int(s[0]))
         sleep()
         mcp1.porta.gpio = 0xff
@@ -128,28 +136,33 @@ def number2display(n):
         selectNumber(int(s[1]))
         sleep()
         mcp1.porta.gpio = 0xff
-        selectDisplay(4)
+        selectDisplay(2)
         selectNumber(int(s[2]))
         sleep()
         mcp1.porta.gpio = 0xff
     elif(digits == 4):
-        selectDisplay(1)
+        selectDisplay(4)
         selectNumber(int(s[0]))
         sleep()
         mcp1.porta.gpio = 0xff
-        selectDisplay(2)
+        selectDisplay(3)
         selectNumber(int(s[1]))
         sleep()
         mcp1.porta.gpio = 0xff
-        selectDisplay(3)
+        selectDisplay(2)
         selectNumber(int(s[2]))
         sleep()
         mcp1.porta.gpio = 0xff
-        selectDisplay(4)
+        selectDisplay(1)
         selectNumber(int(s[3]))
         sleep()
         mcp1.porta.gpio = 0xff
 
+# for digit in range(digits):
+#     selectDisplay()
+#     selectNumber(int(s[digit]))
+#     sleep()
+#     mcp1.porta.gpio = 0xff
 
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
 
