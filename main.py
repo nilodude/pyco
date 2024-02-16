@@ -108,66 +108,17 @@ def rev(s):
 
 def number2display(n):
     s = rev(str(n))
-    
     digits = len(s)
-    
     mcp1.porta.gpio = 0xff
     
-    if(digits == 1):
-        selectDisplay(4)
-        selectNumber(int(s))
-        sleep()
-        mcp1.porta.gpio = 0xff
-    elif(digits == 2):
-        selectDisplay(4)
-        selectNumber(int(s[0]))
-        sleep()
-        mcp1.porta.gpio = 0xff
-        selectDisplay(3)
-        selectNumber(int(s[1]))
-        sleep()
-        mcp1.porta.gpio = 0xff
-    elif(digits == 3):
-        selectDisplay(4)
-        selectNumber(int(s[0]))
-        sleep()
-        mcp1.porta.gpio = 0xff
-        selectDisplay(3)
-        selectNumber(int(s[1]))
-        sleep()
-        mcp1.porta.gpio = 0xff
-        selectDisplay(2)
-        selectNumber(int(s[2]))
-        sleep()
-        mcp1.porta.gpio = 0xff
-    elif(digits == 4):
-        selectDisplay(4)
-        selectNumber(int(s[0]))
-        sleep()
-        mcp1.porta.gpio = 0xff
-        selectDisplay(3)
-        selectNumber(int(s[1]))
-        sleep()
-        mcp1.porta.gpio = 0xff
-        selectDisplay(2)
-        selectNumber(int(s[2]))
-        sleep()
-        mcp1.porta.gpio = 0xff
-        selectDisplay(1)
-        selectNumber(int(s[3]))
+    for digit in range(digits):
+        selectDisplay(4 - digit)
+        selectNumber(int(s[digit]))
         sleep()
         mcp1.porta.gpio = 0xff
 
-# for digit in range(digits):
-#     selectDisplay()
-#     selectNumber(int(s[digit]))
-#     sleep()
-#     mcp1.porta.gpio = 0xff
 
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
-
-
-
 
 
 while(True):
@@ -188,8 +139,6 @@ while(True):
     if(redBtn.value() == 0):
         redled.toggle()
         
-    
-    
     if(sw_encoder.value() == 0):
         print('pulsando encoder')
     
