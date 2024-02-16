@@ -3,7 +3,10 @@ from mcp23017 import MCP23017
 from adc import ADC
 from numbers import number
 import time
+from neopixel import Neopixel
 
+pixels = Neopixel(2, 0, 16, "RGBW")
+neoBtn = Pin(17, Pin.IN, Pin.PULL_UP)
 
 displays = [0b00000001,0b00000010,0b00000100,0b00001000]
 led = Pin("LED", Pin.OUT)
@@ -28,15 +31,31 @@ adc = ADC(i2c1)
 
 i2c0 = I2C(0,scl=Pin(9), sda=Pin(8))
 addresses = i2c0.scan()
-print('i2c0 device on address:')
-print(hex(addresses[0]) if len(addresses) > 0 else 'no addresses found')
+print('i2c0 devices on address:')
+for a in addresses:
+    print(hex(a))
+# print(hex(addresses[0]) if len(addresses) > 0 else 'no addresses found')
 
-mcp = MCP23017(i2c0, 0x20)
+mcp1 = MCP23017(i2c0, 0x20)
 
-mcp.porta.mode = 0x00
-mcp.portb.mode = 0x00
-mcp.gpio = 0x0f00
-mcp.portb.gpio = 0b00001111
+mcp1.porta.mode = 0x00
+mcp1.portb.mode = 0x00
+mcp1.gpio = 0x0f00
+mcp1.portb.gpio = 0b00001111
+
+# mcp2 = MCP23017(i2c0, 0x21)
+# mcp2.porta.mode = 0b00000000
+# mcp2.portb.mode = 0b11111111
+
+
+def cb(val):
+    print('interrupt')
+    print(val)
+
+# interrupt pin
+# interr = Pin(16, mode=Pin.IN)
+# interr.init(mode=interr.IN)
+# interr.irq(trigger=interr.IRQ_FALLING, handler=cb)
 
 def readEncoderValue():
     global clk_encoder
@@ -62,17 +81,17 @@ def readEncoderValue():
     return counter
 
 def selectDisplay(n):
-    global mcp
+    global mcp1
     bina = displays[n-1]
-    mcp.portb.gpio = bina
+    mcp1.portb.gpio = bina
     
 def selectNumber(n):
-    global mcp
-    mcp.porta.gpio = ~number[n]
+    global mcp1
+    mcp1.porta.gpio = ~number[n]
     
 def tick(timer):
     global led
-    global mcp
+    global mcp1
     led.toggle()
 
 def sleep(t=0.00095):
@@ -81,55 +100,59 @@ def sleep(t=0.00095):
 def number2display(n):
     s = str(n)
     digits = len(s)
-    mcp.porta.gpio = 0xff
+    mcp1.porta.gpio = 0xff
     
     if(digits == 1):
         selectDisplay(4)
         selectNumber(int(s))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
     elif(digits == 2):
         selectDisplay(3)
         selectNumber(int(s[0]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
         selectDisplay(4)
         selectNumber(int(s[1]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
     elif(digits == 3):
         selectDisplay(2)
         selectNumber(int(s[0]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
         selectDisplay(3)
         selectNumber(int(s[1]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
         selectDisplay(4)
         selectNumber(int(s[2]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
     elif(digits == 4):
         selectDisplay(1)
         selectNumber(int(s[0]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
         selectDisplay(2)
         selectNumber(int(s[1]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
         selectDisplay(3)
         selectNumber(int(s[2]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
         selectDisplay(4)
         selectNumber(int(s[3]))
         sleep()
-        mcp.porta.gpio = 0xff
+        mcp1.porta.gpio = 0xff
 
 
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
+
+
+
+
 
 while(True):
     encoderValue = readEncoderValue()
@@ -137,12 +160,20 @@ while(True):
     voltage = adc.val_to_voltage(val)
     
     formattedVoltage = "{:d}".format(int(voltage*1000))
-    print("ADC Value:", val, formattedVoltage)
+#     print("ADC Value:", val, formattedVoltage)
     
     number2display(formattedVoltage)
     
-    mcp.gpio = 0x0fff
+    r=int(val/3000)
+    
+    pixels.set_pixel(0, (10-r, r, 10))
+    pixels.set_pixel(1, (2, 10-r, r))
+    pixels.show()
+    
     
     if(sw_encoder.value() == 0):
-        print('pulsando')
+        print('pulsando encoder')
+    
+    if(neoBtn.value() == 0):
+        print('pulsando neopixel')
     
