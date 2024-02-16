@@ -7,6 +7,9 @@ from neopixel import Neopixel
 
 pixels = Neopixel(2, 0, 16, "RGBW")
 neoBtn = Pin(17, Pin.IN, Pin.PULL_UP)
+redled = Pin(18, Pin.OUT)
+redled.value(0)
+redBtn = Pin(19, Pin.IN, Pin.PULL_UP)
 
 displays = [0b00000001,0b00000010,0b00000100,0b00001000]
 led = Pin("LED", Pin.OUT)
@@ -166,9 +169,12 @@ while(True):
     
     r=int(val/3000)
     
-    pixels.set_pixel(0, (10-r, r, 10))
-    pixels.set_pixel(1, (2, 10-r, r))
+    pixels.set_pixel(0, (3, 5+2*r, 30-r))
     pixels.show()
+    
+    if(redBtn.value() == 0):
+        redled.toggle()
+        
     
     
     if(sw_encoder.value() == 0):
