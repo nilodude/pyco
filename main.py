@@ -43,26 +43,6 @@ def cb(val):
     print('interrupt')
     print(val)
 
-# def readEncoderValue():
-#     global encoder
-    
-#     currCLK=encoder.CLK.value()
-#     dt = encoder.DT.value()
-    
-#     if(currCLK != encoder.lastCLK and currCLK == 1):
-#         if(dt != currCLK):
-#             encoder.count -= 1
-#             print(encoder.count)
-#         else:
-#             encoder.count += 1
-#             print(encoder.count)
-    
-#     encoder.lastCLK = encoder.CLK.value()
-    
-#     encoder.count = 0 if encoder.count == 10000 else encoder.count
-#     encoder.count = 9999 if encoder.count == -1 else encoder.count
-    
-
 def selectDisplay(n):
     global mcp1
     bina = displays[n-1]
@@ -97,9 +77,7 @@ def number2display(n):
         sleep()
         mcp1.porta.gpio = 0xff
 
-
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
-
 
 while(True):
     encoder.readValue()
@@ -116,7 +94,6 @@ while(True):
     pixels.set_pixel(0, neoBtn.color)
     pixels.show()
     
-        
     if(encoder.SW.value() == 0):
         print('pulsandddo encodeeeeer')
     
