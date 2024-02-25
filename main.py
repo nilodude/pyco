@@ -2,11 +2,17 @@ from machine import Pin, Timer, I2C
 from mcp23017 import MCP23017
 from adc import ADC
 from numbers import number
+from button import PixelButton, RedButton
 import time
 from neopixel import Neopixel
 
+PXLBTN_0=17
+
 pixels = Neopixel(2, 0, 16, "RGBW")
-neoBtn = Pin(17, Pin.IN, Pin.PULL_UP)
+# neoBtn = Pin(17, Pin.IN, Pin.PULL_UP)
+
+neoBtn = PixelButton(PXLBTN_0, 0)
+
 redled = Pin(18, Pin.OUT)
 redled.value(0)
 redBtn = Pin(19, Pin.IN, Pin.PULL_UP)
@@ -25,13 +31,6 @@ lastBtnPres = 0
 pushBtn = False
 
 
-i2c1 = I2C(1,scl=Pin(15), sda=Pin(14))
-addresses = i2c1.scan()
-print('i2c1 device on address:')
-print(hex(addresses[0]) if len(addresses) > 0 else 'no addresses found')
-
-
-
 i2c0 = I2C(0,scl=Pin(9), sda=Pin(8))
 addresses = i2c0.scan()
 print('i2c0 devices on address:')
@@ -47,19 +46,10 @@ mcp1.portb.mode = 0x00
 mcp1.gpio = 0x0f00
 mcp1.portb.gpio = 0b00001111
 
-# mcp2 = MCP23017(i2c0, 0x21)
-# mcp2.porta.mode = 0b00000000
-# mcp2.portb.mode = 0b11111111
-
-
 def cb(val):
     print('interrupt')
     print(val)
 
-# interrupt pin
-# interr = Pin(16, mode=Pin.IN)
-# interr.init(mode=interr.IN)
-# interr.irq(trigger=interr.IRQ_FALLING, handler=cb)
 
 def readEncoderValue():
     global clk_encoder
@@ -132,16 +122,16 @@ while(True):
     number2display(formattedVoltage)
     
     r=int(val/1500)
-    
-    pixels.set_pixel(0, (3, 5+2*r, 30-r))
+    neoBtn.color = (3, 5+2*r, 30-r)
+    pixels.set_pixel(0, neoBtn.color)
     pixels.show()
     
     if(redBtn.value() == 0):
         redled.toggle()
         
     if(sw_encoder.value() == 0):
-        print('pulsando encoder')
+        print('pulsandddo encodeeeeer')
     
-    if(neoBtn.value() == 0):
+    if(neoBtn.btn.value() == 0):
         print('pulsando neopixel')
     
