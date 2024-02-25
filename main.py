@@ -128,11 +128,10 @@ while(True):
     voltage = adc.val_to_voltage(val)
     
     formattedVoltage = "{:d}".format(int(voltage*1000))
-#     print("ADC Value:", val, formattedVoltage)
     
     number2display(formattedVoltage)
     
-    r=int(val/3000)
+    r=int(val/1500)
     
     pixels.set_pixel(0, (3, 5+2*r, 30-r))
     pixels.show()
