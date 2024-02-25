@@ -2,34 +2,25 @@ from machine import Pin, Timer, I2C
 from mcp23017 import MCP23017
 from adc import ADC
 from numbers import number
-from button import PixelButton, RedButton
+from button import PixelButton, RedButton, Encoder
 import time
 from neopixel import Neopixel
 
-PXLBTN_0=17
-
-pixels = Neopixel(2, 0, 16, "RGBW")
-# neoBtn = Pin(17, Pin.IN, Pin.PULL_UP)
-
-neoBtn = PixelButton(PXLBTN_0, 0)
-
-redled = Pin(18, Pin.OUT)
-redled.value(0)
-redBtn = Pin(19, Pin.IN, Pin.PULL_UP)
-
-displays = [0b00000001,0b00000010,0b00000100,0b00001000]
 led = Pin("LED", Pin.OUT)
 tim = Timer()
 
-clk_encoder = Pin(2, Pin.IN, Pin.PULL_UP)
-dt_encoder = Pin(3, Pin.IN, Pin.PULL_UP)
-sw_encoder = Pin(4, Pin.IN, Pin.PULL_UP)
-currCLK = 0
-counter = 0
-lastCLK = clk_encoder.value()
-lastBtnPres = 0
-pushBtn = False
+PXLBTN_0=17
+PXLBTN_1=0
+PXLBTN_2=0
+PXLBTN_3=0
+PXLBTN_4=0
+PXLBTN_5=0
+PXLBTN_6=0
 
+pixels = Neopixel(2, 0, 16, "RGBW")
+
+neoBtn = PixelButton(PXLBTN_0, 0)
+encoder = Encoder(2,3,4)
 
 i2c0 = I2C(0,scl=Pin(9), sda=Pin(8))
 addresses = i2c0.scan()
@@ -46,33 +37,31 @@ mcp1.portb.mode = 0x00
 mcp1.gpio = 0x0f00
 mcp1.portb.gpio = 0b00001111
 
+displays = [0b00000001,0b00000010,0b00000100,0b00001000]
+
 def cb(val):
     print('interrupt')
     print(val)
 
-
-def readEncoderValue():
-    global clk_encoder
-    global dt_encoder
-    global currCLK
-    global lastCLK
-    global counter
+# def readEncoderValue():
+#     global encoder
     
-    currCLK=clk_encoder.value()
-    dt = dt_encoder.value()
+#     currCLK=encoder.CLK.value()
+#     dt = encoder.DT.value()
     
-    if(currCLK != lastCLK and currCLK == 1):
-        if(dt != currCLK):
-            counter -= 1
-        else:
-            counter += 1
+#     if(currCLK != encoder.lastCLK and currCLK == 1):
+#         if(dt != currCLK):
+#             encoder.count -= 1
+#             print(encoder.count)
+#         else:
+#             encoder.count += 1
+#             print(encoder.count)
     
-    lastCLK = clk_encoder.value()
+#     encoder.lastCLK = encoder.CLK.value()
     
-    counter = 0 if counter == 10000 else counter
-    counter = 9999 if counter == -1 else counter
+#     encoder.count = 0 if encoder.count == 10000 else encoder.count
+#     encoder.count = 9999 if encoder.count == -1 else encoder.count
     
-    return counter
 
 def selectDisplay(n):
     global mcp1
@@ -113,7 +102,8 @@ tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
 
 
 while(True):
-    encoderValue = readEncoderValue()
+    encoder.readValue()
+
     val = adc.read_value()
     voltage = adc.val_to_voltage(val)
     
@@ -126,10 +116,8 @@ while(True):
     pixels.set_pixel(0, neoBtn.color)
     pixels.show()
     
-    if(redBtn.value() == 0):
-        redled.toggle()
         
-    if(sw_encoder.value() == 0):
+    if(encoder.SW.value() == 0):
         print('pulsandddo encodeeeeer')
     
     if(neoBtn.btn.value() == 0):
