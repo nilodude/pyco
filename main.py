@@ -18,6 +18,7 @@ PXLBTN_5=0
 PXLBTN_6=0
 
 pixels = Neopixel(2, 0, 16, "RGBW")
+# pixels = Neopixel(16*16-1, 0, 16, "GRB")
 
 neoBtn = PixelButton(PXLBTN_0, 0)
 encoder = Encoder(2,3,4)
@@ -91,7 +92,10 @@ while(True):
     
     r=int(val/1500)
     neoBtn.color = (3, 5+2*r, 30-r)
+    
     pixels.set_pixel(0, neoBtn.color)
+#     pixels.fill(neoBtn.color)
+
     pixels.show()
     
     if(encoder.SW.value() == 0):
