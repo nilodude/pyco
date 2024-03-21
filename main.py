@@ -17,8 +17,8 @@ PXLBTN_4=0
 PXLBTN_5=0
 PXLBTN_6=0
 
-pixels = Neopixel(2, 0, 16, "RGBW")
-# pixels = Neopixel(16*16-1, 0, 16, "GRB")
+# pixels = Neopixel(2, 0, 16, "RGBW")
+pixels = Neopixel(16*16, 0, 16, "GRB")
 
 neoBtn = PixelButton(PXLBTN_0, 0)
 encoder = Encoder(2,3,4)
@@ -75,7 +75,7 @@ def number2display(n):
     for digit in range(digits):
         selectDisplay(4 - digit)
         selectNumber(int(s[digit]))
-        sleep()
+        sleep(0.002)
         mcp1.porta.gpio = 0xff
 
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
@@ -91,11 +91,16 @@ while(True):
     number2display(formattedVoltage)
     
     r=int(val/1500)
-    neoBtn.color = (3, 5+2*r, 30-r)
+    neoBtn.color = (3, 4+r, 30-r)
     
-    pixels.set_pixel(0, neoBtn.color)
-#     pixels.fill(neoBtn.color)
+    rgbw1 = neoBtn.color
+    rgbw2 = (56,20+0.1*r, 8-0.1*r)
+    pixels.set_pixel_line_gradient(0, 255, rgbw1, rgbw2) # display parpadea cuando hay que llegar a muchos pixeles, se nota latencia
 
+#     hay que investigar porqué el color (aprox) blanco se consigue con (r,g,b)=(94,60,255) en la matriz 16x16
+#     con el r=94, g=60, y bajando el azul de 255 se consigue blanco más cálido, pero al bajar el azul el verde hay que bajarlo un poco tambien
+#     pixels.fill((94,50,100))
+    
     pixels.show()
     
     if(encoder.SW.value() == 0):
