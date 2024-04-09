@@ -17,26 +17,32 @@ PXLBTN_4=0
 PXLBTN_5=0
 PXLBTN_6=0
 
-# pixels = Neopixel(2, 0, 16, "RGBW")
-pixels = Neopixel(16*16, 0, 16, "GRB")
+pixels = Neopixel(1, 0, 16, "RGBW")
 
 neoBtn = PixelButton(PXLBTN_0, 0)
 encoder = Encoder(2,3,4)
 
 i2c0 = I2C(0,scl=Pin(9), sda=Pin(8))
 addresses = i2c0.scan()
-print('i2c0 devices on address:')
-for a in addresses:
-    print(hex(a))
 
-adc = ADC(i2c0)
+if len(addresses)>0:
+    print('i2c0 devices on address:')
+    for a in addresses:
+        print(hex(a))
+    
+    print('setting up adc...')
+    adc = ADC(i2c0)
+    
+    print('setting up port expander...')
+    mcp1 = MCP23017(i2c0, 0x20)
+    mcp1.porta.mode = 0x00
+    mcp1.portb.mode = 0x00
+    mcp1.gpio = 0x0f00
+    mcp1.portb.gpio = 0b00001111
+else:
+    print('no i2c devices found')
+    print('this device is ON but doing NOTHING')
 
-mcp1 = MCP23017(i2c0, 0x20)
-
-mcp1.porta.mode = 0x00
-mcp1.portb.mode = 0x00
-mcp1.gpio = 0x0f00
-mcp1.portb.gpio = 0b00001111
 
 displays = [0b00000001,0b00000010,0b00000100,0b00001000]
 
@@ -79,28 +85,24 @@ def number2display(n):
         mcp1.porta.gpio = 0xff
 
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
-
+r=0
 while(True):
     encoder.readValue()
-
-    val = adc.read_value()
-    voltage = adc.val_to_voltage(val)
+    if 'adc' in globals():
+        val = adc.read_value()
+        voltage = adc.val_to_voltage(val)
     
-    formattedVoltage = "{:d}".format(int(voltage*1000))
+        formattedVoltage = "{:d}".format(int(voltage*1000))
     
-    number2display(formattedVoltage)
+        number2display(formattedVoltage)
     
-    r=int(val/1500)
+        r=int(val/1500)
+        
     neoBtn.color = (3, 4+r, 30-r)
     
-    rgbw1 = neoBtn.color
-    rgbw2 = (56,20+0.1*r, 8-0.1*r)
-    pixels.set_pixel_line_gradient(0, 255, rgbw1, rgbw2) # display parpadea cuando hay que llegar a muchos pixeles, se nota latencia
+    pixels.set_pixel(0, neoBtn.color)
+#     pixels.fill(neoBtn.color)
 
-#     hay que investigar porqué el color (aprox) blanco se consigue con (r,g,b)=(94,60,255) en la matriz 16x16
-#     con el r=94, g=60, y bajando el azul de 255 se consigue blanco más cálido, pero al bajar el azul el verde hay que bajarlo un poco tambien
-#     pixels.fill((94,50,100))
-    
     pixels.show()
     
     if(encoder.SW.value() == 0):
