@@ -30,26 +30,26 @@ pixels = Neopixel(1, 0, 16, "RGBW")
 neoBtn = PixelButton(PXLBTN_0, 0)
 encoder = Encoder(2,3,4)
 
-# i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
-# addresses = i2c0.scan()
-# 
-# if len(addresses)>0:
-#     print('i2c0 devices on address:')
-#     for a in addresses:
-#         print(hex(a))
-#     
-#     print('setting up adc...')
-#     adc = ADC(i2c0)
-#     
-#     print('setting up port expander...')
-#     mcp1 = MCP23017(i2c0, 0x20)
-#     mcp1.porta.mode = 0x00
-#     mcp1.portb.mode = 0x00
-#     mcp1.gpio = 0x0f00
-#     mcp1.portb.gpio = 0b00001111
-# else:
-#     print('no i2c devices found')
-#     print('this device is ON but doing NOTHING')
+i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
+addresses = i2c0.scan()
+
+if len(addresses)>0:
+    print('i2c0 devices on address:')
+    for a in addresses:
+        print(hex(a))
+    
+    print('setting up adc...')
+    adc = ADC(i2c0)
+    
+    print('setting up port expander...')
+    mcp1 = MCP23017(i2c0, 0x20)
+    mcp1.porta.mode = 0x00
+    mcp1.portb.mode = 0x00
+    mcp1.gpio = 0x0f00
+    mcp1.portb.gpio = 0b00001111
+else:
+    print('no i2c devices found')
+    print('this device is ON but doing NOTHING')
 
 
 displays = [0b00000001,0b00000010,0b00000100,0b00001000]
@@ -124,7 +124,9 @@ while(True):
         
       
     for key in redButtons:
-        if(redButtons[key].btn.value() ==0):
+        b = redButtons[key]
+        if(b.btn.value() == 0):
+            b.clicked = True
+        elif(b.clicked == True):
+            b.clicked = False
             print('button ',key)
-        
-    
