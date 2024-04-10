@@ -121,7 +121,8 @@ while(True):
     
     if(neoBtn.btn.value() == 0):
         print('pulsando neopixel')
-        
+    
+    number2display('0666')
       
     for key in redButtons:
         b = redButtons[key]
