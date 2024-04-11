@@ -2,9 +2,11 @@ from machine import Pin, Timer, I2C
 from mcp23017 import MCP23017
 from adc import ADC
 from numbers import number
-from button import PixelButton, RedButton, Encoder
+from button import PixelButton, RedButton, Encoder, PlayButton
 import time
 from neopixel import Neopixel
+import random
+
 
 led = Pin("LED", Pin.OUT)
 tim = Timer()
@@ -28,7 +30,7 @@ buttonA = RedButton(1,0)
 buttonB = RedButton(3,2)
 buttonC = RedButton(7,4)
 buttonD = RedButton(5,6)
-buttonPlay = RedButton(21,0)
+buttonPlay = PlayButton(21)
 
 buttons = {'A': buttonA,
            'B':buttonB,
@@ -80,7 +82,7 @@ def tick(timer):
 #     buttons['C'].led.toggle()
 #     buttons['D'].led.toggle()
 #     buttons['PLAY'].led.toggle()
-    mcp1.portb.gpio ^= 0b01110000
+    mcp1.portb.gpio ^= 0b00110000
     outA.toggle()
 
 def sleep(t=0.00095):
@@ -130,10 +132,10 @@ while(True):
     
 #     mcp1.porta.gpio = 0b00000000
     
-    alt.color = (3, 4, 30)
+#     alt.color = (3, 4, 30)
+#     
+#     pixels.set_pixel(0, alt.color)
     
-    pixels.set_pixel(0, alt.color)
-    pixels.show()
     
     for key in buttons:
         b = buttons[key]
@@ -141,5 +143,16 @@ while(True):
             b.clicked = True
         elif(b.clicked == True):
             b.clicked = False
-            b.led.value(1)
+            if hasattr(b, 'type'):
+                if(b.type == 'red'):
+                    b.led.toggle()
+                elif(b.type == 'play'):
+                    mcp1.portb.gpio ^= 0b01000000
+                elif(b.type == 'pxl'):
+                    r = int(random.random()*255)
+                    g = int(random.random()*255)
+                    bl = int(random.random()*255)
+                    b.color = (r, g, bl)
+                    pixels.set_pixel(b.ledNum,b.color)
+                    pixels.show()
             print('button ',key)

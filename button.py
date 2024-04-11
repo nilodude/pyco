@@ -2,16 +2,24 @@ from machine import Pin
 
 class RedButton:
     def __init__(self, btnPin, ledPin):
+        self.type = 'red'
         self.btn = Pin(btnPin, Pin.IN, Pin.PULL_UP)
         self.led = Pin(ledPin, Pin.OUT)
         self.clicked = False
-
+        
+class PlayButton:
+    def __init__(self, btnPin):
+        self.type = 'play'
+        self.btn = Pin(btnPin, Pin.IN, Pin.PULL_UP)
+        self.led = 0b01000000
+        self.clicked = False
 
 class PixelButton:
     def __init__(self, name, btnPin, ledNum,color=(3,5,30)):
+        self.type = 'pxl'
         self.name = name
         self.btn = Pin(btnPin, Pin.IN, Pin.PULL_UP)
-        self.led = ledNum
+        self.ledNum = ledNum
         self.color = color
         self.clicked = False
 
