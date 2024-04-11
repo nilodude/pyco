@@ -51,20 +51,16 @@ else:
     print('no i2c devices found')
     print('this device is ON but doing NOTHING')
 
-#              PTR3210  
-displays = [0b00000001,
-            0b00000010,
-            0b00000100,
-            0b00001000]
+#                PTR3210  
+displays = {1:0b00000001,
+            2:0b00000010,
+            3:0b00000100,
+            4:0b00001000}
 
 def selectDisplay(n):
     global mcp1
-    bina = displays[n-1]
+    bina = displays[n]
     mcp1.portb.gpio = bina
-    
-def selectNumber(n):
-    global mcp1
-    mcp1.porta.gpio = ~number[n]
     
 def tick(timer):
     global redButtons
@@ -91,7 +87,7 @@ def number2display(n):
     
     for digit in range(digits):
         selectDisplay(4 - digit)
-        selectNumber(int(s[digit]))
+        mcp1.porta.gpio = number[int(s[digit])]
         sleep(0.002)
         mcp1.porta.gpio = 0xff
 

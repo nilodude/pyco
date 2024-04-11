@@ -10,5 +10,5 @@ seven = 0b00000111
 eight = 0b01111111
 nine = 	0b01100111
 point = 0b10000000
-number = [zero, one, two, three,four,five, six, seven, eight,nine]
+number = {0:~zero, 1:~one, 2:~two, 3:~three,4:~four,5:~five, 6:~six, 7:~seven, 8:~eight,9:~nine}
     

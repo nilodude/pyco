@@ -29,10 +29,10 @@ class Encoder:
         
         if(currCLK != self.lastCLK and currCLK == 1):
             if(dt != currCLK):
-                self.count -= 1
+                self.count += 1
                 print(self.count)
             else:
-                self.count += 1
+                self.count -= 1
                 print(self.count)
         
         self.lastCLK = self.CLK.value()
