@@ -1,10 +1,10 @@
 from machine import I2C
 
 class ADC:
-    def __init__(self, i2c_bus, address=72):
+    def __init__(self, i2c_bus, number):
         self.i2c = i2c_bus
-        self.address = address
- 
+        self.address = 0x48
+        self.input = number
     def read_config(self):
         self.i2c.writeto(self.address, bytearray([1]))
         result = self.i2c.readfrom(self.address, 2)

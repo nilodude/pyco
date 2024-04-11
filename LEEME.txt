@@ -1,0 +1,5 @@
+11/04/24:
+	-cuando se le quita alimentacion USB, se resetea el chip y se pierde el interprete de micropython. el código sigue ahi, pero no arranca.
+	-hay que ver ahora el ADC cómo está configurado en la PCB. qué voltajes tiene, etc, es curioso este dato:
+	(https://github.com/robert-hh/ads1x15?tab=readme-ov-file#connection )
+	"The ADS1X15 use a I2C interface. So SCL and SDA have to be connected as minimum. If in continuous mode the CPU shall be triggered, the ALERT/RDY pin has to be connected too, and obviously VDD, GND and the analogue input(2). You might also set the address pin to low (address = 72) or high (address = 73)."

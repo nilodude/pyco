@@ -3,10 +3,8 @@ from mcp23017 import MCP23017
 from adc import ADC
 from numbers import number
 from button import PixelButton, RedButton, Encoder, PlayButton
-import time
+import time, random
 from neopixel import Neopixel
-import random
-
 
 led = Pin("LED", Pin.OUT)
 tim = Timer()
@@ -41,7 +39,7 @@ buttons = {'A': buttonA,
            '+-*/':mult,
            'ENCODER': encoder}
 
-pixels = Neopixel(1, 0, 8, "RGBW")
+pixels = Neopixel(7, 0, 8, "RGBW")
 
 i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
 addresses = i2c0.scan()
@@ -52,7 +50,10 @@ if len(addresses)>0:
         print(hex(a))
     
     print('setting up adc...')
-    adc = ADC(i2c0, 72)
+    adc0 = ADC(i2c0, 0)
+    adc1 = ADC(i2c0, 1)
+    adc2 = ADC(i2c0, 2)
+    adc3 = ADC(i2c0, 3)
     
     print('setting up port expander...')
     mcp1 = MCP23017(i2c0, 0x20)
@@ -77,65 +78,28 @@ def selectDisplay(n):
         
 def tick(timer):
     global buttons
-#     buttons['A'].led.toggle()
-#     buttons['B'].led.toggle()
-#     buttons['C'].led.toggle()
-#     buttons['D'].led.toggle()
-#     buttons['PLAY'].led.toggle()
     mcp1.portb.gpio ^= 0b00110000
     outA.toggle()
 
 def sleep(t=0.00095):
     time.sleep(t)
 
-def rev(s):
-    r = ""
-    for c in s:
-        r = c+r
-    return r
-
-def number2display(n):
-    s = rev(str(n))
-    digits = len(s)
-    mcp1.porta.gpio = 0xff
-    
-    for digit in range(digits):
-        selectDisplay(4 - digit)
-        mcp1.porta.gpio = number[int(s[digit])]
-        sleep(0.002)
-        mcp1.porta.gpio = 0xff
-
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
-r=0
 
-buttons['A'].led.value(0)
-buttons['B'].led.value(0)
-buttons['C'].led.value(0)
-buttons['D'].led.value(0)
 
 while(True):
     encoder.readValue()
-#     if 'adc' in globals():
-#         val = adc.read_value()
-#         voltage = adc.val_to_voltage(val)
+    if 'adc0' in globals():
+        val = adc0.read_value()
+#         print(val)
+#         voltage = adc0.val_to_voltage(val)
 #         formattedVoltage = "{:d}".format(int(voltage*1000))
 #         number2display(formattedVoltage)
 #         r=int(val/1500)
-#         
-#     mult.color = (3, 4+r, 30-r)
-#     
-#     pixels.set_pixel(0, mult.color)
-#     pixels.fill(mult.color)
-#     pixels.show()
-   
+        
 #     number2display('8888')
     
 #     mcp1.porta.gpio = 0b00000000
-    
-#     alt.color = (3, 4, 30)
-#     
-#     pixels.set_pixel(0, alt.color)
-    
     
     for key in buttons:
         b = buttons[key]
@@ -149,10 +113,10 @@ while(True):
                 elif(b.type == 'play'):
                     mcp1.portb.gpio ^= 0b01000000
                 elif(b.type == 'pxl'):
-                    r = int(random.random()*255)
-                    g = int(random.random()*255)
-                    bl = int(random.random()*255)
-                    b.color = (r, g, bl)
+                    R = int(random.random()*50)
+                    G = int(random.random()*50)
+                    B = int(random.random()*50)
+                    b.color = (R, G, B)
                     pixels.set_pixel(b.ledNum,b.color)
                     pixels.show()
             print('button ',key)

@@ -5,7 +5,9 @@ class RedButton:
         self.type = 'red'
         self.btn = Pin(btnPin, Pin.IN, Pin.PULL_UP)
         self.led = Pin(ledPin, Pin.OUT)
+        self.led.value(0)
         self.clicked = False
+        
         
 class PlayButton:
     def __init__(self, btnPin):
@@ -41,13 +43,11 @@ class Encoder:
         if(currCLK != self.lastCLK and currCLK == 1):
             if(dt != currCLK):
                 self.count += 1
+                self.count = 0 if self.count > 9999 else self.count
                 print('encoder ',self.count)
             else:
                 self.count -= 1
+                self.count = 9999 if self.count < 0 else self.count
                 print('encoder ',self.count)
         
         self.lastCLK = self.CLK.value()
-        
-        self.count = 0 if self.count == 10000 else self.count
-        self.count = 9999 if self.count == -1 else self.count
-                
