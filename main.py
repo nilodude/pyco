@@ -8,16 +8,20 @@ from neopixel import Neopixel
 
 led = Pin("LED", Pin.OUT)
 tim = Timer()
-# 
-PXLBTN_0=11  # ALT
+
+outA = Pin(28, Pin.OUT)
+outA.value(0)
+
+PXLBTN_0=11   # ALT
 PXLBTN_1=13   # CV
 PXLBTN_2=20   # PRESET
 PXLBTN_3=24   # TEMPO
 PXLBTN_4=22   # CHANCE
-PXLBTN_5=14  # MUTE
+PXLBTN_5=14   # MUTE
 PXLBTN_6=12   # +*/-
 
-neoBtn = PixelButton('+-*/',PXLBTN_6, 6)
+alt = PixelButton('ALT',PXLBTN_0, 0)
+mult = PixelButton('+-*/',PXLBTN_6, 6)
 encoder = Encoder(18,19,23)
 
 buttonA = RedButton(1,0)
@@ -31,7 +35,8 @@ buttons = {'A': buttonA,
            'C':buttonC,
            'D':buttonD,
            'PLAY': buttonPlay,
-           '+-*/':neoBtn,
+           'ALT':alt,
+           '+-*/':mult,
            'ENCODER': encoder}
 
 pixels = Neopixel(1, 0, 8, "RGBW")
@@ -52,7 +57,7 @@ if len(addresses)>0:
     mcp1.porta.mode = 0x00
     mcp1.portb.mode = 0x00
     mcp1.gpio = 0x0f00
-    mcp1.portb.gpio = 0b01001111
+    mcp1.portb.gpio = 0b01111111
 else:
     print('no i2c devices found')
     print('this device is ON but doing NOTHING')
@@ -75,7 +80,8 @@ def tick(timer):
 #     buttons['C'].led.toggle()
 #     buttons['D'].led.toggle()
 #     buttons['PLAY'].led.toggle()
-    mcp1.portb.gpio |= 0b01000000
+    mcp1.portb.gpio ^= 0b01110000
+    outA.toggle()
 
 def sleep(t=0.00095):
     time.sleep(t)
@@ -100,10 +106,10 @@ def number2display(n):
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
 r=0
 
-buttons['A'].led.value(1)
-buttons['B'].led.value(1)
-buttons['C'].led.value(1)
-buttons['D'].led.value(1)
+buttons['A'].led.value(0)
+buttons['B'].led.value(0)
+buttons['C'].led.value(0)
+buttons['D'].led.value(0)
 
 while(True):
     encoder.readValue()
@@ -114,20 +120,26 @@ while(True):
 #         number2display(formattedVoltage)
 #         r=int(val/1500)
 #         
-#     neoBtn.color = (3, 4+r, 30-r)
+#     mult.color = (3, 4+r, 30-r)
 #     
-#     pixels.set_pixel(0, neoBtn.color)
-#     pixels.fill(neoBtn.color)
+#     pixels.set_pixel(0, mult.color)
+#     pixels.fill(mult.color)
 #     pixels.show()
    
 #     number2display('8888')
     
-    mcp1.porta.gpio = 0b00000000
-      
+#     mcp1.porta.gpio = 0b00000000
+    
+    alt.color = (3, 4, 30)
+    
+    pixels.set_pixel(0, alt.color)
+    pixels.show()
+    
     for key in buttons:
         b = buttons[key]
         if(b.btn.value() == 0):
             b.clicked = True
         elif(b.clicked == True):
             b.clicked = False
+            b.led.value(1)
             print('button ',key)
