@@ -46,13 +46,16 @@ if len(addresses)>0:
     mcp1.porta.mode = 0x00
     mcp1.portb.mode = 0x00
     mcp1.gpio = 0x0f00
-    mcp1.portb.gpio = 0b00001111
+    mcp1.portb.gpio = 0b01001111
 else:
     print('no i2c devices found')
     print('this device is ON but doing NOTHING')
 
-
-displays = [0b00000001,0b00000010,0b00000100,0b00001000]
+#              PTR3210  
+displays = [0b01000001,
+            0b01000010,
+            0b01000100,
+            0b01001000]
 
 def cb(val):
     print('interrupt')
@@ -69,10 +72,10 @@ def selectNumber(n):
     
 def tick(timer):
     global redButtons
-    redButtons['A'].led.toggle()
+#     redButtons['A'].led.toggle()
 #     redButtons['B'].led.toggle()
 #     redButtons['C'].led.toggle()
-    redButtons['D'].led.toggle()
+#     redButtons['D'].led.toggle()
 #     redButtons['PLAY'].led.toggle()
 
 def sleep(t=0.00095):
