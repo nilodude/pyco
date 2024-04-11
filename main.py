@@ -8,14 +8,14 @@ from neopixel import Neopixel
 
 led = Pin("LED", Pin.OUT)
 tim = Timer()
-
-PXLBTN_0=17
-PXLBTN_1=0
-PXLBTN_2=0
-PXLBTN_3=0
-PXLBTN_4=0
-PXLBTN_5=0
-PXLBTN_6=0
+# 
+PXLBTN_0=11  # ALT
+PXLBTN_1=13   # CV
+PXLBTN_2=20   # PRESET
+PXLBTN_3=24   # TEMPO
+PXLBTN_4=22   # CHANCE
+PXLBTN_5=14  # MUTE
+PXLBTN_6=12   # +*/-
 
 buttonA = RedButton(1,0)
 buttonB = RedButton(3,2)
@@ -52,10 +52,10 @@ else:
     print('this device is ON but doing NOTHING')
 
 #              PTR3210  
-displays = [0b01000001,
-            0b01000010,
-            0b01000100,
-            0b01001000]
+displays = [0b00000001,
+            0b00000010,
+            0b00000100,
+            0b00001000]
 
 def cb(val):
     print('interrupt')
@@ -77,6 +77,7 @@ def tick(timer):
 #     redButtons['C'].led.toggle()
 #     redButtons['D'].led.toggle()
 #     redButtons['PLAY'].led.toggle()
+    mcp1.portb.gpio |= 0b01000000
 
 def sleep(t=0.00095):
     time.sleep(t)
@@ -100,6 +101,12 @@ def number2display(n):
 
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
 r=0
+
+redButtons['A'].led.value(1)
+redButtons['B'].led.value(1)
+redButtons['C'].led.value(1)
+redButtons['D'].led.value(1)
+
 while(True):
     encoder.readValue()
     if 'adc' in globals():
@@ -125,7 +132,7 @@ while(True):
     if(neoBtn.btn.value() == 0):
         print('pulsando neopixel')
     
-    number2display('0666')
+    number2display('0660')
       
     for key in redButtons:
         b = redButtons[key]
