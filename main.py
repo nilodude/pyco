@@ -28,7 +28,7 @@ redButtons = {'A': buttonA, 'B':buttonB, 'C':buttonC, 'D':buttonD, 'PLAY': butto
 pixels = Neopixel(1, 0, 16, "RGBW")
 
 neoBtn = PixelButton(PXLBTN_0, 0)
-encoder = Encoder(2,3,4)
+encoder = Encoder(18,19,23)
 
 i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
 addresses = i2c0.scan()
@@ -39,7 +39,7 @@ if len(addresses)>0:
         print(hex(a))
     
     print('setting up adc...')
-    adc = ADC(i2c0)
+    adc = ADC(i2c0, 72)
     
     print('setting up port expander...')
     mcp1 = MCP23017(i2c0, 0x20)
@@ -56,10 +56,6 @@ displays = [0b00000001,
             0b00000010,
             0b00000100,
             0b00001000]
-
-def cb(val):
-    print('interrupt')
-    print(val)
 
 def selectDisplay(n):
     global mcp1
@@ -109,30 +105,32 @@ redButtons['D'].led.value(1)
 
 while(True):
     encoder.readValue()
-    if 'adc' in globals():
-        val = adc.read_value()
-        voltage = adc.val_to_voltage(val)
-    
-        formattedVoltage = "{:d}".format(int(voltage*1000))
-    
-        number2display(formattedVoltage)
-    
-        r=int(val/1500)
-        
-    neoBtn.color = (3, 4+r, 30-r)
-    
-    pixels.set_pixel(0, neoBtn.color)
+#     if 'adc' in globals():
+#         val = adc.read_value()
+#         voltage = adc.val_to_voltage(val)
+#     
+#         formattedVoltage = "{:d}".format(int(voltage*1000))
+#     
+#         number2display(formattedVoltage)
+#     
+#         r=int(val/1500)
+#         
+#     neoBtn.color = (3, 4+r, 30-r)
+#     
+#     pixels.set_pixel(0, neoBtn.color)
 #     pixels.fill(neoBtn.color)
     
-    pixels.show()
+#     pixels.show()
     
     if(encoder.SW.value() == 0):
         print('pulsandddo encodeeeeer')
     
-    if(neoBtn.btn.value() == 0):
-        print('pulsando neopixel')
+#     if(neoBtn.btn.value() == 0):
+#         print('pulsando neopixel')
     
-    number2display('0660')
+#     number2display('8888')
+    
+    mcp1.porta.gpio = 0b11111011
       
     for key in redButtons:
         b = redButtons[key]

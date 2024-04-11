@@ -7,8 +7,8 @@ four= 	0b01100110
 five= 	0b01100100
 six = 	0b01111101
 seven = 0b00000111
-eight = 0b11111111
-nine = 	0b11100111
+eight = 0b01111111
+nine = 	0b01100111
 point = 0b10000000
 number = [zero, one, two, three,four,five, six, seven, eight,nine]
     
