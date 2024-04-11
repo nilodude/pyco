@@ -17,18 +17,24 @@ PXLBTN_4=22   # CHANCE
 PXLBTN_5=14  # MUTE
 PXLBTN_6=12   # +*/-
 
+neoBtn = PixelButton('+-*/',PXLBTN_6, 6)
+encoder = Encoder(18,19,23)
+
 buttonA = RedButton(1,0)
 buttonB = RedButton(3,2)
 buttonC = RedButton(7,4)
 buttonD = RedButton(5,6)
 buttonPlay = RedButton(21,0)
 
-redButtons = {'A': buttonA, 'B':buttonB, 'C':buttonC, 'D':buttonD, 'PLAY': buttonPlay}
+buttons = {'A': buttonA,
+           'B':buttonB,
+           'C':buttonC,
+           'D':buttonD,
+           'PLAY': buttonPlay,
+           '+-*/':neoBtn,
+           'ENCODER': encoder}
 
-pixels = Neopixel(1, 0, 16, "RGBW")
-
-neoBtn = PixelButton(PXLBTN_0, 0)
-encoder = Encoder(18,19,23)
+pixels = Neopixel(1, 0, 8, "RGBW")
 
 i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
 addresses = i2c0.scan()
@@ -51,24 +57,24 @@ else:
     print('no i2c devices found')
     print('this device is ON but doing NOTHING')
 
-#                PTR3210  
-displays = {1:0b00000001,
-            2:0b00000010,
-            3:0b00000100,
-            4:0b00001000}
+#              PTR3210  
+displays = [0b00000001,
+            0b00000010,
+            0b00000100,
+            0b00001000]
 
 def selectDisplay(n):
     global mcp1
-    bina = displays[n]
+    bina = displays[n-1]
     mcp1.portb.gpio = bina
-    
+        
 def tick(timer):
-    global redButtons
-#     redButtons['A'].led.toggle()
-#     redButtons['B'].led.toggle()
-#     redButtons['C'].led.toggle()
-#     redButtons['D'].led.toggle()
-#     redButtons['PLAY'].led.toggle()
+    global buttons
+#     buttons['A'].led.toggle()
+#     buttons['B'].led.toggle()
+#     buttons['C'].led.toggle()
+#     buttons['D'].led.toggle()
+#     buttons['PLAY'].led.toggle()
     mcp1.portb.gpio |= 0b01000000
 
 def sleep(t=0.00095):
@@ -94,42 +100,32 @@ def number2display(n):
 tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
 r=0
 
-redButtons['A'].led.value(1)
-redButtons['B'].led.value(1)
-redButtons['C'].led.value(1)
-redButtons['D'].led.value(1)
+buttons['A'].led.value(1)
+buttons['B'].led.value(1)
+buttons['C'].led.value(1)
+buttons['D'].led.value(1)
 
 while(True):
     encoder.readValue()
 #     if 'adc' in globals():
 #         val = adc.read_value()
 #         voltage = adc.val_to_voltage(val)
-#     
 #         formattedVoltage = "{:d}".format(int(voltage*1000))
-#     
 #         number2display(formattedVoltage)
-#     
 #         r=int(val/1500)
 #         
 #     neoBtn.color = (3, 4+r, 30-r)
 #     
 #     pixels.set_pixel(0, neoBtn.color)
 #     pixels.fill(neoBtn.color)
-    
 #     pixels.show()
-    
-    if(encoder.SW.value() == 0):
-        print('pulsandddo encodeeeeer')
-    
-#     if(neoBtn.btn.value() == 0):
-#         print('pulsando neopixel')
-    
+   
 #     number2display('8888')
     
-    mcp1.porta.gpio = 0b11111011
+    mcp1.porta.gpio = 0b00000000
       
-    for key in redButtons:
-        b = redButtons[key]
+    for key in buttons:
+        b = buttons[key]
         if(b.btn.value() == 0):
             b.clicked = True
         elif(b.clicked == True):

@@ -8,20 +8,23 @@ class RedButton:
 
 
 class PixelButton:
-    def __init__(self, btnPin, ledNum,color=(3,5,30)):
+    def __init__(self, name, btnPin, ledNum,color=(3,5,30)):
+        self.name = name
         self.btn = Pin(btnPin, Pin.IN, Pin.PULL_UP)
         self.led = ledNum
         self.color = color
+        self.clicked = False
 
 class Encoder:
      
     def __init__(self, clkPin, dtPin,swPin):
         self.CLK = Pin(clkPin, Pin.IN, Pin.PULL_UP)
         self.DT =Pin(dtPin, Pin.IN, Pin.PULL_UP)
-        self.SW = Pin(swPin, Pin.IN, Pin.PULL_UP)
+        self.btn = Pin(swPin, Pin.IN, Pin.PULL_UP)
         self.currCLK = 0
         self.count = 0
         self.lastCLK= self.CLK.value()
+        self.clicked = False
 
     def readValue(self):
         currCLK=self.CLK.value()
@@ -30,10 +33,10 @@ class Encoder:
         if(currCLK != self.lastCLK and currCLK == 1):
             if(dt != currCLK):
                 self.count += 1
-                print(self.count)
+                print('encoder ',self.count)
             else:
                 self.count -= 1
-                print(self.count)
+                print('encoder ',self.count)
         
         self.lastCLK = self.CLK.value()
         
