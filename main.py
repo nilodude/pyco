@@ -76,7 +76,7 @@ if len(addresses)>0:
     mcp1.porta.mode = 0x00
     mcp1.portb.mode = 0x00
     mcp1.gpio = 0x0f00
-    mcp1.portb.gpio = 0b01111111
+#     mcp1.portb.gpio = 0b11111111
 else:
     print('no i2c devices found')
     print('this device is ON but doing NOTHING')
@@ -87,24 +87,28 @@ displays = [0b00000001,
             0b00000100,
             0b00001000]
 
-# def selectDisplay(n):
-#     global mcp1
-#     bina = displays[n-1]
-#     mcp1.portb.gpio = bina
-        
+def selectDisplay(n):
+    mcp1.portb.gpio ^= displays[n]
+
+count =0    
 def tick(timer):
-    mcp1.portb.gpio ^= 0b10010000
+    global count
+    mcp1.portb.gpio ^= 0b00010000
     outA.toggle()
     outB.toggle()
     outC.toggle()
     outD.toggle()
-    mcp1.porta.gpio = number[int(random.random()*10)]
+    print(count)
+    selectDisplay(count)
+    mcp1.porta.gpio = number[count]
+    count = 0 if count > 2 else count +1
 
 def sleep(t=0.00095):
     time.sleep(t)
 
-tim.init(freq=1, mode=Timer.PERIODIC, callback=tick)
+tim.init(freq=2, mode=Timer.PERIODIC, callback=tick)
 
+mcp1.portb.gpio ^= 0b00100000
 
 while(True):
     encoder.readValue()
