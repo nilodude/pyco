@@ -87,14 +87,13 @@ displays = [0b00000001,
             0b00000100,
             0b00001000]
 
-def selectDisplay(n):
-    global mcp1
-    bina = displays[n-1]
-    mcp1.portb.gpio = bina
+# def selectDisplay(n):
+#     global mcp1
+#     bina = displays[n-1]
+#     mcp1.portb.gpio = bina
         
 def tick(timer):
-    global buttons
-    mcp1.portb.gpio ^= 0b00110000
+    mcp1.portb.gpio ^= 0b10010000
     outA.toggle()
     outB.toggle()
     outC.toggle()
