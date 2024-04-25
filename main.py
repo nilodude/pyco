@@ -94,12 +94,12 @@ def selectDisplay(n):
         
 def tick(timer):
     global buttons
-    mcp1.portb.gpio ^= 0b01110000
+    mcp1.portb.gpio ^= 0b00110000
     outA.toggle()
     outB.toggle()
     outC.toggle()
     outD.toggle()
-    mcp1.porta.gpio = number[random.random()*10]
+    mcp1.porta.gpio = number[int(random.random()*10)]
 
 def sleep(t=0.00095):
     time.sleep(t)
