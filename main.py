@@ -76,7 +76,7 @@ if len(addresses)>0:
     mcp1.porta.mode = 0x00
     mcp1.portb.mode = 0x00
     mcp1.gpio = 0x0f00
-#     mcp1.portb.gpio = 0b11111111
+    mcp1.portb.gpio = 0b11111111
 else:
     print('no i2c devices found')
     print('this device is ON but doing NOTHING')
@@ -88,7 +88,12 @@ displays = [0b00000001,
             0b00001000]
 
 def selectDisplay(n):
-    mcp1.portb.gpio ^= displays[n]
+    mcp1.portb.gpio = mcp1.portb.gpio & displays[n]
+
+def show(n):
+    selectDisplay(0)
+    mcp1.porta.gpio = number[int(n[0])]
+
 val = 0
 prev = 0
 count =0    
@@ -96,15 +101,16 @@ def tick(timer):
     global prev
     global val
 #     mcp1.portb.gpio ^= 0b01110000
-#     outA.toggle()
-#     outB.toggle()
-#     outC.toggle()
-#     outD.toggle()
+    outA.toggle()
+    outB.toggle()
+    outC.toggle()
+    outD.toggle()
 #     mcp1.porta.gpio = number[count]
 #     count = 0 if count > 2 else count +1
-    if (prev != val):
-        print(val)
-        prev = val
+    if (prev != formattedVoltage):
+        print(formattedVoltage)
+        prev = formattedVoltage
+        show(prev)
         
         
 def sleep(t=0.00095):
@@ -117,9 +123,8 @@ while(True):
     encoder.readValue()
     if 'adc0' in globals():
         val = adc0.read_value()
-#         print(val)
-#         voltage = adc0.val_to_voltage(val)*1000
-#         formattedVoltage = "{:d}".format(int(voltage*1000))
+        voltage = adc0.val_to_voltage(val)
+        formattedVoltage = "{:d}".format(int(voltage*1000))
 #         print(voltage)
 #         number2display(formattedVoltage)
 #         r=int(val/1500)
