@@ -10,7 +10,13 @@ led = Pin("LED", Pin.OUT)
 tim = Timer()
 
 outA = Pin(28, Pin.OUT)
+outB = Pin(27, Pin.OUT)
+outC = Pin(26, Pin.OUT)
+outD = Pin(25, Pin.OUT)
 outA.value(0)
+outB.value(0)
+outC.value(0)
+outD.value(0)
 
 PXLBTN_0=11   # ALT
 PXLBTN_1=13   # CV
@@ -21,6 +27,11 @@ PXLBTN_5=14   # MUTE
 PXLBTN_6=12   # +*/-
 
 alt = PixelButton('ALT',PXLBTN_0, 0)
+cv = PixelButton('CV',PXLBTN_1, 1)
+preset = PixelButton('PRESET',PXLBTN_2, 2)
+tempo = PixelButton('TEMPO',PXLBTN_3, 3)
+chance = PixelButton('CHANCE',PXLBTN_4, 4)
+mute = PixelButton('MUTE',PXLBTN_5, 5)
 mult = PixelButton('+-*/',PXLBTN_6, 6)
 encoder = Encoder(18,19,23)
 
@@ -36,6 +47,11 @@ buttons = {'A': buttonA,
            'D':buttonD,
            'PLAY': buttonPlay,
            'ALT':alt,
+           'CV':cv,
+           'PRESET':preset,
+           'TEMPO':tempo,
+           'CHANCE':chance,
+           'MUTE':mute,
            '+-*/':mult,
            'ENCODER': encoder}
 
@@ -78,8 +94,12 @@ def selectDisplay(n):
         
 def tick(timer):
     global buttons
-    mcp1.portb.gpio ^= 0b00110000
+    mcp1.portb.gpio ^= 0b01110000
     outA.toggle()
+    outB.toggle()
+    outC.toggle()
+    outD.toggle()
+    mcp1.porta.gpio = number[random.random()*10]
 
 def sleep(t=0.00095):
     time.sleep(t)
@@ -99,7 +119,7 @@ while(True):
         
 #     number2display('8888')
     
-#     mcp1.porta.gpio = 0b00000000
+#     mcp1.porta.gpio = number[3]
     
     for key in buttons:
         b = buttons[key]
