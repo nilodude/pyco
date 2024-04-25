@@ -21,5 +21,5 @@ class ADC:
         return result[0] << 8 | result[1]
  
     @staticmethod
-    def val_to_voltage(val, max_val=26100, voltage_ref=3.3):
+    def val_to_voltage(val, max_val=65535, voltage_ref=3.3):
         return val / max_val * voltage_ref
