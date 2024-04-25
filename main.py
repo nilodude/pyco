@@ -124,7 +124,7 @@ while(True):
     if 'adc0' in globals():
         val = adc0.read_value()
         voltage = adc0.val_to_voltage(val)
-        formattedVoltage = "{:d}".format(int(voltage*1000))
+        formattedVoltage = "{:04d}".format(int(voltage*1000))
 #         print(voltage)
 #         number2display(formattedVoltage)
 #         r=int(val/1500)
