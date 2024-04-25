@@ -89,24 +89,28 @@ displays = [0b00000001,
 
 def selectDisplay(n):
     mcp1.portb.gpio ^= displays[n]
-
+val = 0
+prev = 0
 count =0    
 def tick(timer):
-    global count
-    mcp1.portb.gpio ^= 0b01110000
-    outA.toggle()
-    outB.toggle()
-    outC.toggle()
-    outD.toggle()
-    
-#     selectDisplay(count)
-    mcp1.porta.gpio = number[count]
-    count = 0 if count > 2 else count +1
-
+    global prev
+    global val
+#     mcp1.portb.gpio ^= 0b01110000
+#     outA.toggle()
+#     outB.toggle()
+#     outC.toggle()
+#     outD.toggle()
+#     mcp1.porta.gpio = number[count]
+#     count = 0 if count > 2 else count +1
+    if (prev != val):
+        print(val)
+        prev = val
+        
+        
 def sleep(t=0.00095):
     time.sleep(t)
 
-tim.init(freq=2, mode=Timer.PERIODIC, callback=tick)
+tim.init(freq=20, mode=Timer.PERIODIC, callback=tick)
 
 
 while(True):
@@ -114,15 +118,16 @@ while(True):
     if 'adc0' in globals():
         val = adc0.read_value()
 #         print(val)
-#         voltage = adc0.val_to_voltage(val)
+#         voltage = adc0.val_to_voltage(val)*1000
 #         formattedVoltage = "{:d}".format(int(voltage*1000))
+#         print(voltage)
 #         number2display(formattedVoltage)
 #         r=int(val/1500)
         
 #     number2display('8888')
     
 #     mcp1.porta.gpio = number[3]
-    
+    selectDisplay(count)
     for key in buttons:
         b = buttons[key]
         if(b.btn.value() == 0):
