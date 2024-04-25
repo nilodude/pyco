@@ -33,6 +33,8 @@ tempo = PixelButton('TEMPO',PXLBTN_3, 3)
 chance = PixelButton('CHANCE',PXLBTN_4, 4)
 mute = PixelButton('MUTE',PXLBTN_5, 5)
 mult = PixelButton('+-*/',PXLBTN_6, 6)
+
+
 encoder = Encoder(18,19,23)
 
 buttonA = RedButton(1,0)
@@ -56,6 +58,17 @@ buttons = {'A': buttonA,
            'ENCODER': encoder}
 
 pixels = Neopixel(7, 0, 8, "RGBW")
+
+for key in buttons:
+    b = buttons[key]
+    if hasattr(b, 'type'):
+        if(b.type == 'pxl'):
+            R = int(random.random()*50)
+            G = int(random.random()*50)
+            B = int(random.random()*50)
+            b.color = (R, G, B)
+            pixels.set_pixel(b.ledNum,b.color)
+            
 
 i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
 addresses = i2c0.scan()
@@ -88,32 +101,41 @@ displays = [0b00000001,
             0b00001000]
 
 def selectDisplay(n):
-    mcp1.portb.gpio = mcp1.portb.gpio & displays[n]
+    mcp1.portb.gpio &= ~(1 << 0)
+    mcp1.portb.gpio &= ~(1 << 1)
+    mcp1.portb.gpio &= ~(1 << 2)
+    mcp1.portb.gpio &= ~(1 << 3)
+    
+    mcp1.portb.gpio |= (1 << n)
 
 def show(n):
-    selectDisplay(0)
-    mcp1.porta.gpio = number[int(n[0])]
+        mcp1.porta.gpio = 0xff
+        
+        for i in range(4):
+            selectDisplay(i)
+            mcp1.porta.gpio = number[int(n[i])]
+            sleep()
+            mcp1.porta.gpio = 0xff  
 
 val = 0
 prev = 0
-count =0    
+   
 def tick(timer):
     global prev
     global val
-#     mcp1.portb.gpio ^= 0b01110000
+
     outA.toggle()
     outB.toggle()
     outC.toggle()
     outD.toggle()
-#     mcp1.porta.gpio = number[count]
-#     count = 0 if count > 2 else count +1
+
     if (prev != formattedVoltage):
         print(formattedVoltage)
         prev = formattedVoltage
-        show(prev)
+    
         
         
-def sleep(t=0.00095):
+def sleep(t=0.003):
     time.sleep(t)
 
 tim.init(freq=20, mode=Timer.PERIODIC, callback=tick)
@@ -121,18 +143,18 @@ tim.init(freq=20, mode=Timer.PERIODIC, callback=tick)
 
 while(True):
     encoder.readValue()
-    if 'adc0' in globals():
-        val = adc0.read_value()
-        voltage = adc0.val_to_voltage(val)
+    if 'adc2' in globals():
+        val = adc2.read_value()
+        voltage = adc1.val_to_voltage(val)
         formattedVoltage = "{:04d}".format(int(voltage*1000))
 #         print(voltage)
 #         number2display(formattedVoltage)
 #         r=int(val/1500)
         
 #     number2display('8888')
-    
-#     mcp1.porta.gpio = number[3]
-    selectDisplay(count)
+
+    show(formattedVoltage)
+
     for key in buttons:
         b = buttons[key]
         if(b.btn.value() == 0):
