@@ -13,10 +13,10 @@ outA = Pin(28, Pin.OUT)
 outB = Pin(27, Pin.OUT)
 outC = Pin(26, Pin.OUT)
 outD = Pin(25, Pin.OUT)
-outA.value(0)
-outB.value(0)
-outC.value(0)
-outD.value(0)
+outA.value(1)
+outB.value(1)
+outC.value(1)
+outD.value(1)
 
 PXLBTN_0=11   # ALT
 PXLBTN_1=13   # CV
@@ -93,13 +93,13 @@ def selectDisplay(n):
 count =0    
 def tick(timer):
     global count
-    mcp1.portb.gpio ^= 0b00010000
+    mcp1.portb.gpio ^= 0b01110000
     outA.toggle()
     outB.toggle()
     outC.toggle()
     outD.toggle()
-    print(count)
-    selectDisplay(count)
+    
+#     selectDisplay(count)
     mcp1.porta.gpio = number[count]
     count = 0 if count > 2 else count +1
 
@@ -108,7 +108,6 @@ def sleep(t=0.00095):
 
 tim.init(freq=2, mode=Timer.PERIODIC, callback=tick)
 
-mcp1.portb.gpio ^= 0b00100000
 
 while(True):
     encoder.readValue()
