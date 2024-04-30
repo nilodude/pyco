@@ -6,17 +6,35 @@ from button import PixelButton, RedButton, Encoder, PlayButton
 import time, random
 from neopixel import Neopixel
 
-led = Pin("LED", Pin.OUT)
 tim = Timer()
+
+syncIN = Pin(9, Pin.IN, Pin.PULL_UP)
+presetIN = machine.ADC(29)
+resetIN = Pin(10, Pin.IN, Pin.PULL_UP)
+ststpIN = Pin(15, Pin.IN, Pin.PULL_UP)
+
+inputs =  {
+    'SYNC':syncIN,
+    'preset':presetIN,
+    'reset':resetIN,
+    'ststp':ststpIN}
 
 outA = Pin(28, Pin.OUT)
 outB = Pin(27, Pin.OUT)
 outC = Pin(26, Pin.OUT)
 outD = Pin(25, Pin.OUT)
-outA.value(1)
-outB.value(1)
-outC.value(1)
-outD.value(1)
+outA.value(0)
+outB.value(0)
+outC.value(0)
+outD.value(0)
+
+buttonA = RedButton(1,0)
+buttonB = RedButton(3,2)
+buttonC = RedButton(7,4)
+buttonD = RedButton(5,6)
+
+encoder = Encoder(18,19,23)
+buttonPlay = PlayButton(21)
 
 PXLBTN_0=11   # ALT
 PXLBTN_1=13   # CV
@@ -34,14 +52,6 @@ chance = PixelButton('CHANCE',PXLBTN_4, 4)
 mute = PixelButton('MUTE',PXLBTN_5, 5)
 mult = PixelButton('+-*/',PXLBTN_6, 6)
 
-
-encoder = Encoder(18,19,23)
-
-buttonA = RedButton(1,0)
-buttonB = RedButton(3,2)
-buttonC = RedButton(7,4)
-buttonD = RedButton(5,6)
-buttonPlay = PlayButton(21)
 
 buttons = {'A': buttonA,
            'B':buttonB,
@@ -124,10 +134,10 @@ def tick(timer):
     global prev
     global val
 
-    outA.toggle()
-    outB.toggle()
-    outC.toggle()
-    outD.toggle()
+#     outA.toggle()
+#     outB.toggle()
+#     outC.toggle()
+#     outD.toggle()
 
     if (prev != formattedVoltage):
         print(formattedVoltage)
@@ -142,6 +152,12 @@ tim.init(freq=20, mode=Timer.PERIODIC, callback=tick)
 
 
 while(True):
+#     print(syncIN.value())
+    outA.value(syncIN.value())
+    outB.value(presetIN.read_u16())
+    outC.value(resetIN.value())
+    outD.value(resetIN.value())
+    
     encoder.readValue()
     if 'adc2' in globals():
         val = adc2.read_value()
