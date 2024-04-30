@@ -11,14 +11,14 @@ tim = Timer()
 syncIN = Pin(9, Pin.IN, Pin.PULL_UP)
 presetIN = machine.ADC(29)
 resetIN = Pin(10, Pin.IN, Pin.PULL_UP)
-ststpIN = Pin(15, Pin.IN, Pin.PULL_UP)
 
 inputs =  {
     'SYNC':syncIN,
-    'preset':presetIN,
-    'reset':resetIN,
-    'ststp':ststpIN}
+    'PRESET':presetIN,
+    'RESET':resetIN,
+    }
 
+ststpOUT = Pin(15, Pin.OUT)
 outA = Pin(28, Pin.OUT)
 outB = Pin(27, Pin.OUT)
 outC = Pin(26, Pin.OUT)
@@ -110,6 +110,13 @@ displays = [0b00000001,
             0b00000100,
             0b00001000]
 
+outputs= {
+    'ST':ststpOUT,
+    'A':outA,
+    'B':outB,
+    'C':outC,
+    'D':outD}
+
 def selectDisplay(n):
     mcp1.portb.gpio &= ~(1 << 0)
     mcp1.portb.gpio &= ~(1 << 1)
@@ -138,7 +145,8 @@ def tick(timer):
 #     outB.toggle()
 #     outC.toggle()
 #     outD.toggle()
-
+    ststpOUT.toggle()
+    
     if (prev != formattedVoltage):
         print(formattedVoltage)
         prev = formattedVoltage
@@ -152,9 +160,8 @@ tim.init(freq=20, mode=Timer.PERIODIC, callback=tick)
 
 
 while(True):
-#     print(syncIN.value())
     outA.value(syncIN.value())
-    outB.value(presetIN.read_u16())
+    outB.value(presetIN.read_u16() > 35000)
     outC.value(resetIN.value())
     outD.value(resetIN.value())
     
