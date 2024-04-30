@@ -24,10 +24,10 @@ outA = Pin(28, Pin.OUT)
 outB = Pin(27, Pin.OUT)
 outC = Pin(26, Pin.OUT)
 outD = Pin(25, Pin.OUT)
-outA.value(0)
-outB.value(0)
-outC.value(0)
-outD.value(0)
+outA.value(1)
+outB.value(1)
+outC.value(1)
+outD.value(1)
 
 buttonA = RedButton(1,0)
 buttonB = RedButton(3,2)
@@ -167,27 +167,28 @@ def readChannel(channel,voltage = False):
 while(True):
     encoder.readValue()
     if 'adc' in globals():
-        inA= readChannel(ADS1115_COMP_0_GND,True)
-    
+        inA= readChannel(ADS1115_COMP_0_GND)
+        
         vA = "{:04d}".format(int(inA*1000))
         
-        inB= readChannel(ADS1115_COMP_1_GND,True)
+        inB= readChannel(ADS1115_COMP_1_GND)
         vB = "{:04d}".format(int(inB*1000))
         
-        inC= readChannel(ADS1115_COMP_2_GND,True)
+        inC= readChannel(ADS1115_COMP_2_GND)
         vC = "{:04d}".format(int(inC*1000))
         
-        inD= readChannel(ADS1115_COMP_3_GND,True)
+        inD= readChannel(ADS1115_COMP_3_GND)
         vD = "{:04d}".format(int(inD*1000))
         
-        outA.value(inA > 1)
+        
         outB.value(inB > 1)
         outC.value(inC > 1)
         outD.value(inD > 1)
 #         print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
 
     show(vA)
-
+    outA.value(syncIN.value())
+    
     for key in buttons:
         b = buttons[key]
         if(b.btn.value() == 0):
