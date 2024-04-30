@@ -7,7 +7,7 @@ class ADC:
         self.input = number
     def read_config(self):
         self.i2c.writeto(self.address, bytearray([1]))
-        result = self.i2c.readfrom(self.address, 2)
+        result = self.i2c.readfrom(self.address,2)
         return result[0] << 8 | result[1]
  
     def read_value(self):

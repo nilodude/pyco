@@ -147,9 +147,9 @@ def tick(timer):
 #     outD.toggle()
     ststpOUT.toggle()
     
-    if (prev != formattedVoltage):
-        print(formattedVoltage)
-        prev = formattedVoltage
+    if (prev != val):
+        print(val)
+        prev = val
     
         
         
@@ -160,13 +160,14 @@ tim.init(freq=20, mode=Timer.PERIODIC, callback=tick)
 
 
 while(True):
-    outA.value(syncIN.value())
+    inA=adc0.read_value() > 12000
+    outA.value(inA)
     outB.value(presetIN.read_u16() > 35000)
     outC.value(resetIN.value())
     outD.value(resetIN.value())
     
     encoder.readValue()
-    if 'adc2' in globals():
+    if 'adc0' in globals():
         val = adc2.read_value()
         voltage = adc1.val_to_voltage(val)
         formattedVoltage = "{:04d}".format(int(voltage*1000))
