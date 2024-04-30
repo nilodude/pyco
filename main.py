@@ -1,10 +1,11 @@
 from machine import Pin, Timer, I2C
 from mcp23017 import MCP23017
-from adc import ADC
+from adc import *
 from numbers import number
 from button import PixelButton, RedButton, Encoder, PlayButton
 import time, random
 from neopixel import Neopixel
+ADS1115_ADDRESS = 0x48
 
 tim = Timer()
 
@@ -89,10 +90,8 @@ if len(addresses)>0:
         print(hex(a))
     
     print('setting up adc...')
-    adc0 = ADC(i2c0, 0)
-    adc1 = ADC(i2c0, 1)
-    adc2 = ADC(i2c0, 2)
-    adc3 = ADC(i2c0, 3)
+    adc = ADS1115(ADS1115_ADDRESS, i2c=i2c0)
+    adc.setMeasureMode(ADS1115_SINGLE)
     
     print('setting up port expander...')
     mcp1 = MCP23017(i2c0, 0x20)
@@ -141,43 +140,53 @@ def tick(timer):
     global prev
     global val
 
-#     outA.toggle()
-#     outB.toggle()
-#     outC.toggle()
-#     outD.toggle()
     ststpOUT.toggle()
     
     if (prev != val):
         print(val)
         prev = val
     
-        
-        
 def sleep(t=0.003):
     time.sleep(t)
 
 tim.init(freq=20, mode=Timer.PERIODIC, callback=tick)
 
+def readChannel(channel,voltage = False):
+    adc.setCompareChannels(channel)
+    adc.startSingleMeasurement()
+    while adc.isBusy():
+        pass
+    if voltage:
+        value = adc.getResult_V()
+    else:
+        value = adc.getRawResult()
+    
+    return value
+
 
 while(True):
-    inA=adc0.read_value() > 12000
-    outA.value(inA)
-    outB.value(presetIN.read_u16() > 35000)
-    outC.value(resetIN.value())
-    outD.value(resetIN.value())
-    
     encoder.readValue()
-    if 'adc0' in globals():
-        val = adc2.read_value()
-        voltage = adc1.val_to_voltage(val)
-        formattedVoltage = "{:04d}".format(int(voltage*1000))
-#         print(voltage)
-#         number2display(formattedVoltage)
-#         r=int(val/1500)
+    if 'adc' in globals():
+        inA= readChannel(ADS1115_COMP_0_GND,True)
+    
+        vA = "{:04d}".format(int(inA*1000))
         
-#     number2display('8888')
+        inB= readChannel(ADS1115_COMP_1_GND,True)
+        vB = "{:04d}".format(int(inB*1000))
+        
+        inC= readChannel(ADS1115_COMP_2_GND,True)
+        vC = "{:04d}".format(int(inC*1000))
+        
+        inD= readChannel(ADS1115_COMP_3_GND,True)
+        vD = "{:04d}".format(int(inD*1000))
+        
+        outA.value(inA > 1)
+        outB.value(inB > 1)
+        outC.value(inC > 1)
+        outD.value(inD > 1)
+#         print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
 
-    show(formattedVoltage)
+    show(vA)
 
     for key in buttons:
         b = buttons[key]
