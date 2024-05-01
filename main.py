@@ -126,20 +126,22 @@ def selectDisplay(n):
     mcp1.portb.gpio |= (1 << n)
 
 def show(n):
+    size = len(n)
+    offset = 4 - size
+    
+    for i in range(size):
+        selectDisplay(i+offset)
+        mcp1.porta.gpio = number[int(n[i])]
+        sleep()
         mcp1.porta.gpio = 0xff
-        
-        for i in range(4):
-            selectDisplay(i)
-            mcp1.porta.gpio = number[int(n[i])]
-            sleep()
-            mcp1.porta.gpio = 0xff  
+    
    
 def tick(timer):
     global vA
     ststpOUT.toggle()
     show(vA)
     
-def sleep(t=0.001):
+def sleep(t=0.002):
     time.sleep(t)
 
 tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
@@ -162,7 +164,7 @@ while(True):
     if 'adc' in globals():
         inA= readChannel(ADS1115_COMP_0_GND,True)
         
-        vA = "{:04d}".format(int(inA*1000))
+        vA = "{:d}".format(int(inA*1000))
         
         inB= readChannel(ADS1115_COMP_1_GND)
         vB = "{:04d}".format(int(inB*1000))
@@ -179,7 +181,10 @@ while(True):
         outD.value(inD > 1)
         print(vA+'\t'+str(inB)+'\t'+str(inC)+'\t'+str(inD)+'\t')
 
-#     show(vA)
+#     if (shouldDisplay):
+#         shouldDisplay = False
+#         show(vA)
+        
     outA.value(syncIN.value())
     
     for key in buttons:
