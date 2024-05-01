@@ -25,6 +25,7 @@ if len(addresses)>0:
     mcp1.portb.mode = 0x00
     mcp1.gpio = 0x0f00
     mcp1.portb.gpio = 0b11111111
+    mcp1.porta.gpio = 0xff
 else:
     print('no i2c devices found')
     print('this device is ON but doing NOTHING')
@@ -57,10 +58,10 @@ outB.value(1)
 outC.value(1)
 outD.value(1)
 
-buttonA = RedButton(1,0)
-buttonB = RedButton(3,2)
-buttonC = RedButton(7,4)
-buttonD = RedButton(5,6)
+buttonA = RedButton(1,0,0)
+buttonB = RedButton(3,2,1)
+buttonC = RedButton(7,4,2)
+buttonD = RedButton(5,6,3)
 
 encoder = Encoder(18,19,23)
 buttonPlay = PlayButton(21)
@@ -128,23 +129,33 @@ def selectDisplay(n):
 def show(n):
     size = len(n)
     offset = 4 - size
-    
+#     mcp1.porta.gpio = 0xff
     for i in range(size):
         selectDisplay(i+offset)
         mcp1.porta.gpio = number[int(n[i])]
-        sleep()
+        sleep(0.0015)
         mcp1.porta.gpio = 0xff
-    
    
 def tick(timer):
-    global vA
+    global inputValues
+    global selectedInput
     ststpOUT.toggle()
-    show(vA)
     
-def sleep(t=0.002):
+    show(inputValues[selectedInput])
+#         print(inputValues[selectedInput])
+#     selectDisplay(0)
+#     mcp1.porta.gpio = number[3]
+#     sleep(0.002)
+    mcp1.porta.gpio = 0xff
+#     selectDisplay(1)
+#     mcp1.porta.gpio = number[4]
+#     sleep(0.002)
+#     mcp1.porta.gpio = 0xff
+    
+def sleep(t=0.001):
     time.sleep(t)
 
-tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
+tim.init(freq=60, mode=Timer.PERIODIC, callback=tick)
 
 def readChannel(channel,voltage = False):
     adc.setCompareChannels(channel)
@@ -159,6 +170,8 @@ def readChannel(channel,voltage = False):
     return value
 
 vA= ""
+selectedInput = 0
+inputValues = ["","","",""]
 while(True):
     encoder.readValue()
     if 'adc' in globals():
@@ -166,26 +179,31 @@ while(True):
         
         vA = "{:d}".format(int(inA*1000))
         
-        inB= readChannel(ADS1115_COMP_1_GND)
-        vB = "{:04d}".format(int(inB*1000))
+        inB= readChannel(ADS1115_COMP_1_GND,True)
+        vB = "{:d}".format(int(inB*1000))
         
-        inC= readChannel(ADS1115_COMP_2_GND)
-        vC = "{:04d}".format(int(inC*1000))
+        inC= readChannel(ADS1115_COMP_2_GND,True)
+        vC = "{:d}".format(int(inC*1000))
         
-        inD= readChannel(ADS1115_COMP_3_GND)
-        vD = "{:04d}".format(int(inD*1000))
+        inD= readChannel(ADS1115_COMP_3_GND,True)
+        vD = "{:d}".format(int(inD*1000))
         
+        inputValues[0]= vA
+        inputValues[1]= vB
+        inputValues[2]= vC
+        inputValues[3]= vD
         
         outB.value(inB > 1)
         outC.value(inC > 1)
         outD.value(inD > 1)
-        print(vA+'\t'+str(inB)+'\t'+str(inC)+'\t'+str(inD)+'\t')
-
+#         print(vA+'\t'+str(inB)+'\t'+str(inC)+'\t'+str(inD)+'\t')
+        print(inputValues)
 #     if (shouldDisplay):
 #         shouldDisplay = False
 #         show(vA)
-        
+#     show(vA)    
     outA.value(syncIN.value())
+    
     
     for key in buttons:
         b = buttons[key]
@@ -196,6 +214,8 @@ while(True):
             if hasattr(b, 'type'):
                 if(b.type == 'red'):
                     b.led.toggle()
+                    selectedInput = b.index
+                    
                 elif(b.type == 'play'):
                     mcp1.portb.gpio ^= 0b01000000
                 elif(b.type == 'pxl'):

@@ -1,13 +1,13 @@
 from machine import Pin
 
 class RedButton:
-    def __init__(self, btnPin, ledPin):
+    def __init__(self, btnPin, ledPin,index):
         self.type = 'red'
         self.btn = Pin(btnPin, Pin.IN, Pin.PULL_UP)
         self.led = Pin(ledPin, Pin.OUT)
         self.led.value(0)
         self.clicked = False
-        
+        self.index=index
         
 class PlayButton:
     def __init__(self, btnPin):
