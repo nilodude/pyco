@@ -204,7 +204,12 @@ while(True):
             b.clicked = False
             if hasattr(b, 'type'):
                 if(b.type == 'red'):
-                    b.led.toggle()
+                    buttonA.led.value(0)
+                    buttonB.led.value(0)
+                    buttonC.led.value(0)
+                    buttonD.led.value(0)
+                    
+                    b.led.value(1)
                     selectedInput = b.index
                     
                 elif(b.type == 'play'):
