@@ -7,6 +7,34 @@ import time, random
 from neopixel import Neopixel
 ADS1115_ADDRESS = 0x48
 
+i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
+addresses = i2c0.scan()
+
+if len(addresses)>0:
+    print('i2c0 devices on address:')
+    for a in addresses:
+        print(hex(a))
+    
+    print('setting up adc...')
+    adc = ADS1115(ADS1115_ADDRESS, i2c=i2c0)
+    adc.setMeasureMode(ADS1115_SINGLE)
+    
+    print('setting up port expander...')
+    mcp1 = MCP23017(i2c0, 0x20)
+    mcp1.porta.mode = 0x00
+    mcp1.portb.mode = 0x00
+    mcp1.gpio = 0x0f00
+    mcp1.portb.gpio = 0b11111111
+else:
+    print('no i2c devices found')
+    print('this device is ON but doing NOTHING')
+
+#              PTR3210  
+displays = [0b00000001,
+            0b00000010,
+            0b00000100,
+            0b00001000]
+
 tim = Timer()
 
 syncIN = Pin(9, Pin.IN, Pin.PULL_UP)
@@ -80,34 +108,7 @@ for key in buttons:
             b.color = (R, G, B)
             pixels.set_pixel(b.ledNum,b.color)
             
-
-i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
-addresses = i2c0.scan()
-
-if len(addresses)>0:
-    print('i2c0 devices on address:')
-    for a in addresses:
-        print(hex(a))
-    
-    print('setting up adc...')
-    adc = ADS1115(ADS1115_ADDRESS, i2c=i2c0)
-    adc.setMeasureMode(ADS1115_SINGLE)
-    
-    print('setting up port expander...')
-    mcp1 = MCP23017(i2c0, 0x20)
-    mcp1.porta.mode = 0x00
-    mcp1.portb.mode = 0x00
-    mcp1.gpio = 0x0f00
-    mcp1.portb.gpio = 0b11111111
-else:
-    print('no i2c devices found')
-    print('this device is ON but doing NOTHING')
-
-#              PTR3210  
-displays = [0b00000001,
-            0b00000010,
-            0b00000100,
-            0b00001000]
+pixels.show()
 
 outputs= {
     'ST':ststpOUT,
@@ -132,24 +133,16 @@ def show(n):
             mcp1.porta.gpio = number[int(n[i])]
             sleep()
             mcp1.porta.gpio = 0xff  
-
-val = 0
-prev = 0
    
 def tick(timer):
-    global prev
-    global val
-
+    global vA
     ststpOUT.toggle()
+    show(vA)
     
-    if (prev != val):
-        print(val)
-        prev = val
-    
-def sleep(t=0.003):
+def sleep(t=0.001):
     time.sleep(t)
 
-tim.init(freq=20, mode=Timer.PERIODIC, callback=tick)
+tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
 
 def readChannel(channel,voltage = False):
     adc.setCompareChannels(channel)
@@ -163,11 +156,11 @@ def readChannel(channel,voltage = False):
     
     return value
 
-
+vA= ""
 while(True):
     encoder.readValue()
     if 'adc' in globals():
-        inA= readChannel(ADS1115_COMP_0_GND)
+        inA= readChannel(ADS1115_COMP_0_GND,True)
         
         vA = "{:04d}".format(int(inA*1000))
         
@@ -184,9 +177,9 @@ while(True):
         outB.value(inB > 1)
         outC.value(inC > 1)
         outD.value(inD > 1)
-#         print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
+        print(vA+'\t'+str(inB)+'\t'+str(inC)+'\t'+str(inD)+'\t')
 
-    show(vA)
+#     show(vA)
     outA.value(syncIN.value())
     
     for key in buttons:
