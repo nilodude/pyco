@@ -137,10 +137,11 @@ def show(n):
         mcp1.porta.gpio = 0xff
    
 def tick(timer):
-    global inputValues
+    global values
     global selectedInput
     ststpOUT.toggle()
-    show(vA)
+    
+    show(values[selectedInput])
 
     
 def sleep(t=0.001):
@@ -161,28 +162,36 @@ def readChannel(channel,voltage = False):
     return value
 
 vA= ""
+vB= ""
+vC= ""
+vD= ""
+
+values = ["0","0","0","0"]
+selectedInput = 0
 while(True):
     encoder.readValue()
     if 'adc' in globals():
         inA= readChannel(ADS1115_COMP_0_GND,True)
         
-        vA = "{:d}".format(int(inA*1000))
+        values[0] = "{:d}".format(int(inA*1000))
         
         inB= readChannel(ADS1115_COMP_1_GND,True)
-        vB = "{:d}".format(int(inB*1000))
+        values[1] = "{:d}".format(int(inB*1000))
         
         inC= readChannel(ADS1115_COMP_2_GND,True)
-        vC = "{:d}".format(int(inC*1000))
+        values[2] = "{:d}".format(int(inC*1000))
         
         inD= readChannel(ADS1115_COMP_3_GND,True)
-        vD = "{:d}".format(int(inD*1000))
+        values[3] = "{:d}".format(int(inD*1000))
         
         
         outB.value(inB > 1)
         outC.value(inC > 1)
         outD.value(inD > 1)
         
-        print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
+        print(values)
+        
+#         print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
     
     outA.value(syncIN.value())
     
