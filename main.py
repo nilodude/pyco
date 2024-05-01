@@ -129,33 +129,24 @@ def selectDisplay(n):
 def show(n):
     size = len(n)
     offset = 4 - size
-#     mcp1.porta.gpio = 0xff
+    
     for i in range(size):
         selectDisplay(i+offset)
-        mcp1.porta.gpio = number[int(n[i])]
-        sleep(0.0015)
+        mcp1.porta.gpio = number[n[i]]
+        sleep(0.002)
         mcp1.porta.gpio = 0xff
    
 def tick(timer):
     global inputValues
     global selectedInput
     ststpOUT.toggle()
-    
-    show(inputValues[selectedInput])
-#         print(inputValues[selectedInput])
-#     selectDisplay(0)
-#     mcp1.porta.gpio = number[3]
-#     sleep(0.002)
-    mcp1.porta.gpio = 0xff
-#     selectDisplay(1)
-#     mcp1.porta.gpio = number[4]
-#     sleep(0.002)
-#     mcp1.porta.gpio = 0xff
+    show(vA)
+
     
 def sleep(t=0.001):
     time.sleep(t)
 
-tim.init(freq=60, mode=Timer.PERIODIC, callback=tick)
+tim.init(freq=40, mode=Timer.PERIODIC, callback=tick)
 
 def readChannel(channel,voltage = False):
     adc.setCompareChannels(channel)
@@ -170,8 +161,6 @@ def readChannel(channel,voltage = False):
     return value
 
 vA= ""
-selectedInput = 0
-inputValues = ["","","",""]
 while(True):
     encoder.readValue()
     if 'adc' in globals():
@@ -188,20 +177,13 @@ while(True):
         inD= readChannel(ADS1115_COMP_3_GND,True)
         vD = "{:d}".format(int(inD*1000))
         
-        inputValues[0]= vA
-        inputValues[1]= vB
-        inputValues[2]= vC
-        inputValues[3]= vD
         
         outB.value(inB > 1)
         outC.value(inC > 1)
         outD.value(inD > 1)
-#         print(vA+'\t'+str(inB)+'\t'+str(inC)+'\t'+str(inD)+'\t')
-        print(inputValues)
-#     if (shouldDisplay):
-#         shouldDisplay = False
-#         show(vA)
-#     show(vA)    
+        
+        print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
+    
     outA.value(syncIN.value())
     
     
