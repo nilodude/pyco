@@ -1,7 +1,7 @@
 from machine import Pin, Timer, I2C
 from mcp23017 import MCP23017
 from adc import *
-from numbers import number
+from numbers import *
 from button import PixelButton, RedButton, Encoder, PlayButton
 import time, random
 from neopixel import Neopixel
@@ -30,23 +30,12 @@ else:
     print('no i2c devices found')
     print('this device is ON but doing NOTHING')
 
-#              PTR3210  
-displays = [0b00000001,
-            0b00000010,
-            0b00000100,
-            0b00001000]
-
 tim = Timer()
+tim2 = Timer()
 
 syncIN = Pin(9, Pin.IN, Pin.PULL_UP)
 presetIN = machine.ADC(29)
 resetIN = Pin(10, Pin.IN, Pin.PULL_UP)
-
-inputs =  {
-    'SYNC':syncIN,
-    'PRESET':presetIN,
-    'RESET':resetIN,
-    }
 
 ststpOUT = Pin(15, Pin.OUT)
 outA = Pin(28, Pin.OUT)
@@ -57,6 +46,22 @@ outA.value(1)
 outB.value(1)
 outC.value(1)
 outD.value(1)
+
+signals= {
+    'inputs' :  {
+        'SYNC':syncIN,
+        'PRESET':presetIN,
+        'RESET':resetIN,
+    },
+    'outputs': {
+        'ST':ststpOUT,
+        'A':outA,
+        'B':outB,
+        'C':outC,
+        'D':outD}
+}
+values = ["0","0","0","0"]
+selectedInput = 0
 
 buttonA = RedButton(1,0,0)
 buttonB = RedButton(3,2,1)
@@ -81,7 +86,6 @@ tempo = PixelButton('TEMPO',PXLBTN_3, 3)
 chance = PixelButton('CHANCE',PXLBTN_4, 4)
 mute = PixelButton('MUTE',PXLBTN_5, 5)
 mult = PixelButton('+-*/',PXLBTN_6, 6)
-
 
 buttons = {'A': buttonA,
            'B':buttonB,
@@ -110,14 +114,7 @@ for key in buttons:
             pixels.set_pixel(b.ledNum,b.color)
             
 pixels.show()
-
-outputs= {
-    'ST':ststpOUT,
-    'A':outA,
-    'B':outB,
-    'C':outC,
-    'D':outD}
-
+#################################################
 def selectDisplay(n):
     mcp1.portb.gpio &= ~(1 << 0)
     mcp1.portb.gpio &= ~(1 << 1)
@@ -135,19 +132,21 @@ def show(n):
         mcp1.porta.gpio = number[n[i]]
         sleep(0.002)
         mcp1.porta.gpio = 0xff
-   
+        
+def sleep(t=0.001):
+    time.sleep(t)
+    
 def tick(timer):
     global values
     global selectedInput
-    ststpOUT.toggle()
-    
     show(values[selectedInput])
 
-    
-def sleep(t=0.001):
-    time.sleep(t)
+def ststp(timer):
+    ststpOUT.toggle()
+
 
 tim.init(freq=40, mode=Timer.PERIODIC, callback=tick)
+tim2.init(freq=50, mode=Timer.PERIODIC, callback=ststp)
 
 def readChannel(channel,voltage = False):
     adc.setCompareChannels(channel)
@@ -161,13 +160,7 @@ def readChannel(channel,voltage = False):
     
     return value
 
-vA= ""
-vB= ""
-vC= ""
-vD= ""
 
-values = ["0","0","0","0"]
-selectedInput = 0
 while(True):
     encoder.readValue()
     if 'adc' in globals():
@@ -184,18 +177,16 @@ while(True):
         inD= readChannel(ADS1115_COMP_3_GND,True)
         values[3] = "{:d}".format(int(inD*1000))
         
-        
         outB.value(inB > 1)
         outC.value(inC > 1)
         outD.value(inD > 1)
         
-        print(values)
+#         print(values)
         
 #         print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
     
     outA.value(syncIN.value())
-    
-    
+      
     for key in buttons:
         b = buttons[key]
         if(b.btn.value() == 0):

@@ -11,4 +11,9 @@ eight = 0b01111111
 nine = 	0b01100111
 point = 0b10000000
 number = {'0':~zero, '1':~one, '2':~two, '3':~three,'4':~four,'5':~five, '6':~six, '7':~seven, '8':~eight,'9':~nine}
-    
+
+#              PTR3210  
+displays = [0b00000001,
+            0b00000010,
+            0b00000100,
+            0b00001000]
