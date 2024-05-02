@@ -5,6 +5,11 @@ from numbers import *
 from button import PixelButton, RedButton, Encoder, PlayButton
 import time, random
 from neopixel import Neopixel
+
+# hay que estudiarse los bucles de clock_mod.py (https://github.com/Allen-Synthesis/EuroPi/blob/main/software/contrib/clock_mod.py#L248)
+# y la forma con la que define los objetos ClockOutput con funciones como setExternalClock y el voltaje de salida con PWM
+
+
 ADS1115_ADDRESS = 0x48
 
 i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
