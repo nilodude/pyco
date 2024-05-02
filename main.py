@@ -120,33 +120,35 @@ def selectDisplay(n):
     mcp1.portb.gpio &= ~(1 << 1)
     mcp1.portb.gpio &= ~(1 << 2)
     mcp1.portb.gpio &= ~(1 << 3)
-    
     mcp1.portb.gpio |= (1 << n)
-
-def show(n):
-    size = len(n)
-    offset = 4 - size
     
-    for i in range(size):
-        selectDisplay(i+offset)
-        mcp1.porta.gpio = number[n[i]]
-        sleep(0.002)
-        mcp1.porta.gpio = 0xff
+prevN = "0"
+def show(n):  
+        size = len(n)
+        offset = 4 - size
+    
+        for i in range(size):
+            selectDisplay(i+offset)
+            mcp1.porta.gpio = number[n[i]]
+            sleep(0.002)
+            mcp1.porta.gpio = 0xff
         
 def sleep(t=0.001):
     time.sleep(t)
     
 def tick(timer):
-    global values
-    global selectedInput
     show(values[selectedInput])
 
 def ststp(timer):
     ststpOUT.toggle()
+    outA.toggle()
+    outB.toggle()
+    outC.toggle()
+    outD.toggle()
 
 
-tim.init(freq=40, mode=Timer.PERIODIC, callback=tick)
-tim2.init(freq=50, mode=Timer.PERIODIC, callback=ststp)
+tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
+tim2.init(freq=100, mode=Timer.PERIODIC, callback=ststp)
 
 def readChannel(channel,voltage = False):
     adc.setCompareChannels(channel)
@@ -177,15 +179,15 @@ while(True):
         inD= readChannel(ADS1115_COMP_3_GND,True)
         values[3] = "{:d}".format(int(inD*1000))
         
-        outB.value(inB > 1)
-        outC.value(inC > 1)
-        outD.value(inD > 1)
+#         outB.value(inB > 1)
+#         outC.value(inC > 1)
+#         outD.value(inD > 1)
         
 #         print(values)
         
 #         print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
     
-    outA.value(syncIN.value())
+#     outA.value(syncIN.value())
       
     for key in buttons:
         b = buttons[key]
