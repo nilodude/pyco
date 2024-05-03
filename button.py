@@ -32,9 +32,10 @@ class Encoder:
         self.DT =Pin(dtPin, Pin.IN, Pin.PULL_UP)
         self.btn = Pin(swPin, Pin.IN, Pin.PULL_UP)
         self.currCLK = 0
-        self.count = 0
+        self.count = 1
         self.lastCLK= self.CLK.value()
         self.clicked = False
+        self.shouldRead = True
 
     def readValue(self,minV,maxV):
         currCLK=self.CLK.value()
@@ -42,12 +43,14 @@ class Encoder:
         
         if(currCLK != self.lastCLK and currCLK == 1):
             if(dt != currCLK):
-                self.count += 1
-                self.count = minV if self.count > maxV else self.count
-                print('encoder ',self.count)
-            else:
                 self.count -= 1
                 self.count = maxV if self.count < minV else self.count
                 print('encoder ',self.count)
+                self.shouldRead = True
+            else:
+                self.count += 1
+                self.count = minV if self.count > maxV else self.count
+                print('encoder ',self.count)
+                self.shouldRead = True
         
         self.lastCLK = self.CLK.value()

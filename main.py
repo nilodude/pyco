@@ -172,6 +172,18 @@ def readChannel(channel,voltage = False):
 while(True):
     encoder.readValue(1, 4)
     values[4] = str(encoder.count)
+    
+    if(selectedInput == 4 and encoder.shouldRead):
+        encoder.shouldRead = False
+        if(encoder.count > 2):
+            newFreq = 10 * encoder.count # hardcoded initial 10Hz clock
+            outA.freq(newFreq)
+        else:
+            newFreq = 2+int(10 / encoder.count)
+            print(newFreq)
+            outA.freq(newFreq)
+        
+    
     if 'adc' in globals():
         inA= readChannel(ADS1115_COMP_0_GND,True)
         
