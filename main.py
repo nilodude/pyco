@@ -1,4 +1,4 @@
-from machine import Pin, Timer, I2C
+from machine import Pin, PWM, Timer, I2C
 from mcp23017 import MCP23017
 from adc import *
 from numbers import *
@@ -43,14 +43,19 @@ presetIN = machine.ADC(29)
 resetIN = Pin(10, Pin.IN, Pin.PULL_UP)
 
 ststpOUT = Pin(15, Pin.OUT)
-outA = Pin(28, Pin.OUT)
-outB = Pin(27, Pin.OUT)
-outC = Pin(26, Pin.OUT)
-outD = Pin(25, Pin.OUT)
-outA.value(1)
-outB.value(1)
-outC.value(1)
-outD.value(1)
+outA = PWM(Pin(28))
+outB = PWM(Pin(27))
+outC = PWM(Pin(26))
+outD = PWM(Pin(25))
+outA.freq(250)
+outB.freq(30)
+outC.freq(35)
+outD.freq(50)
+outA.duty_u16(32768)
+outB.duty_u16(32768)
+outC.duty_u16(32768)
+outD.duty_u16(32768)
+
 
 signals= {
     'inputs' :  {
@@ -146,10 +151,6 @@ def tick(timer):
 
 def ststp(timer):
     ststpOUT.toggle()
-    outA.toggle()
-    outB.toggle()
-    outC.toggle()
-    outD.toggle()
 
 
 tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
@@ -184,15 +185,10 @@ while(True):
         inD= readChannel(ADS1115_COMP_3_GND,True)
         values[3] = "{:d}".format(int(inD*1000))
         
-#         outB.value(inB > 1)
-#         outC.value(inC > 1)
-#         outD.value(inD > 1)
-        
 #         print(values)
         
 #         print(vA+'\t'+vB+'\t'+vC+'\t'+vD+'\t')
     
-#     outA.value(syncIN.value())
       
     for key in buttons:
         b = buttons[key]
