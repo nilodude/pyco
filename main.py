@@ -3,6 +3,7 @@ from mcp23017 import MCP23017
 from adc import *
 from numbers import *
 from button import PixelButton, RedButton, Encoder, PlayButton
+from output import *
 import time, random
 from neopixel import Neopixel
 
@@ -43,18 +44,12 @@ presetIN = machine.ADC(29)
 resetIN = Pin(10, Pin.IN, Pin.PULL_UP)
 
 ststpOUT = Pin(15, Pin.OUT)
-outA = PWM(Pin(28))
+
+outA = Output(28,0)
 outB = PWM(Pin(27))
 outC = PWM(Pin(26))
 outD = PWM(Pin(25))
-outA.freq(10)
-outB.freq(30)
-outC.freq(35)
-outD.freq(50)
-outA.duty_u16(32768)
-outB.duty_u16(32768)
-outC.duty_u16(32768)
-outD.duty_u16(32768)
+
 
 
 signals= {
@@ -64,11 +59,12 @@ signals= {
         'RESET':resetIN,
     },
     'outputs': {
-        'ST':ststpOUT,
+#         'ST':ststpOUT,
         'A':outA,
-        'B':outB,
-        'C':outC,
-        'D':outD}
+#         'B':outB,
+#         'C':outC,
+#         'D':outD
+        }
 }
 values = ["0","0","0","0","0"]
 selectedInput = 0
@@ -234,6 +230,13 @@ while(True):
                     pixels.set_pixel(b.ledNum,b.color)
                     pixels.show()
             print('button ',key)
-    
-#     for key in signals['outputs']:
-        
+            
+    now = time.ticks_ms()
+    for key in signals['outputs']:
+#         output.set_external_clock(self.last_clock_at)
+        o = signals['outputs'][key]
+        o.calculate_state(now)
+
+    for key in signals['outputs']:
+        o = signals['outputs'][key]
+        o.set_output_voltage()
