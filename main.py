@@ -51,10 +51,10 @@ outA.freq(10)
 outB.freq(30)
 outC.freq(35)
 outD.freq(50)
-outA.duty_u16(10)
-outB.duty_u16(100)
-outC.duty_u16(1000)
-outD.duty_u16(10000)
+outA.duty_u16(32768)
+outB.duty_u16(32768)
+outC.duty_u16(32768)
+outD.duty_u16(32768)
 
 
 signals= {
@@ -225,8 +225,8 @@ while(True):
                     
                     if(key == '+-*/'):
                         selectedInput = 4  # hardcoded encoder count value
-                        
                         outA.freq(outA.freq() * encoder.count)
+                        
                     R = int(random.random()*50)
                     G = int(random.random()*50)
                     B = int(random.random()*50)
