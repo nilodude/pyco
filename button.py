@@ -36,18 +36,18 @@ class Encoder:
         self.lastCLK= self.CLK.value()
         self.clicked = False
 
-    def readValue(self):
+    def readValue(self,minV,maxV):
         currCLK=self.CLK.value()
         dt = self.DT.value()
         
         if(currCLK != self.lastCLK and currCLK == 1):
             if(dt != currCLK):
                 self.count += 1
-                self.count = 0 if self.count > 9999 else self.count
+                self.count = minV if self.count > maxV else self.count
                 print('encoder ',self.count)
             else:
                 self.count -= 1
-                self.count = 9999 if self.count < 0 else self.count
+                self.count = maxV if self.count < minV else self.count
                 print('encoder ',self.count)
         
         self.lastCLK = self.CLK.value()

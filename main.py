@@ -47,7 +47,7 @@ outA = PWM(Pin(28))
 outB = PWM(Pin(27))
 outC = PWM(Pin(26))
 outD = PWM(Pin(25))
-outA.freq(250)
+outA.freq(10)
 outB.freq(30)
 outC.freq(35)
 outD.freq(50)
@@ -70,7 +70,7 @@ signals= {
         'C':outC,
         'D':outD}
 }
-values = ["0","0","0","0"]
+values = ["0","0","0","0","0"]
 selectedInput = 0
 
 buttonA = RedButton(1,0,0)
@@ -170,7 +170,8 @@ def readChannel(channel,voltage = False):
 
 
 while(True):
-    encoder.readValue()
+    encoder.readValue(1, 4)
+    values[4] = str(encoder.count)
     if 'adc' in globals():
         inA= readChannel(ADS1115_COMP_0_GND,True)
         
@@ -209,6 +210,11 @@ while(True):
                 elif(b.type == 'play'):
                     mcp1.portb.gpio ^= 0b01000000
                 elif(b.type == 'pxl'):
+                    
+                    if(key == '+-*/'):
+                        selectedInput = 4  # hardcoded encoder count value
+                        
+                        outA.freq(outA.freq() * encoder.count)
                     R = int(random.random()*50)
                     G = int(random.random()*50)
                     B = int(random.random()*50)
@@ -216,3 +222,6 @@ while(True):
                     pixels.set_pixel(b.ledNum,b.color)
                     pixels.show()
             print('button ',key)
+    
+#     for key in signals['outputs']:
+        
