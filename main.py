@@ -51,10 +51,10 @@ outA.freq(10)
 outB.freq(30)
 outC.freq(35)
 outD.freq(50)
-outA.duty_u16(32768)
-outB.duty_u16(32768)
-outC.duty_u16(32768)
-outD.duty_u16(32768)
+outA.duty_u16(10)
+outB.duty_u16(100)
+outC.duty_u16(1000)
+outD.duty_u16(10000)
 
 
 signals= {
