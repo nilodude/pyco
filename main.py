@@ -45,10 +45,10 @@ resetIN = Pin(10, Pin.IN, Pin.PULL_UP)
 
 ststpOUT = Pin(15, Pin.OUT)
 
-outA = Output(28,0)
-outB = PWM(Pin(27))
-outC = PWM(Pin(26))
-outD = PWM(Pin(25))
+outA = Pin(28)
+outB = Pin(27)
+outC = Pin(26)
+outD = Pin(25)
 
 
 
@@ -147,6 +147,8 @@ def tick(timer):
 
 def ststp(timer):
     ststpOUT.toggle()
+    outA.toggle()
+    outB.toggle()
 
 
 tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
@@ -164,11 +166,13 @@ def readChannel(channel,voltage = False):
     
     return value
 
-
+elapsed = 0
+lastToggle=0
+outA.value(0)
 while(True):
     encoder.readValue(1, 4)
     values[4] = str(encoder.count)
-    
+    now = time.ticks_ms()
     if(selectedInput == 4 and encoder.shouldRead):
         encoder.shouldRead = False
         if(encoder.count > 2):
@@ -231,12 +235,9 @@ while(True):
                     pixels.show()
             print('button ',key)
             
-    now = time.ticks_ms()
-    for key in signals['outputs']:
-#         output.set_external_clock(self.last_clock_at)
-        o = signals['outputs'][key]
-        o.calculate_state(now)
+    
+    elapsed_ms = time.ticks_diff(now,lastToggle)
+    if(elapsed_ms > 50):
+        lastToggle = time.ticks_ms()
 
-    for key in signals['outputs']:
-        o = signals['outputs'][key]
-        o.set_output_voltage()
+    
