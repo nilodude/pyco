@@ -1,4 +1,5 @@
 from machine import Pin
+from rotary_irq import RotaryIRQ
 
 class RedButton:
     def __init__(self, btnPin, ledPin,index):
@@ -25,32 +26,18 @@ class PixelButton:
         self.color = color
         self.clicked = False
 
-class Encoder:
+class Encoder(RotaryIRQ):
      
-    def __init__(self, clkPin, dtPin,swPin):
-        self.CLK = Pin(clkPin, Pin.IN, Pin.PULL_UP)
-        self.DT =Pin(dtPin, Pin.IN, Pin.PULL_UP)
+    def __init__(self, clkPin, dtPin,swPin,minV, maxV):
         self.btn = Pin(swPin, Pin.IN, Pin.PULL_UP)
-        self.currCLK = 0
-        self.count = 1
-        self.lastCLK= self.CLK.value()
+        self.count = 0
         self.clicked = False
         self.shouldRead = True
-
-    def readValue(self,minV,maxV):
-        currCLK=self.CLK.value()
-        dt = self.DT.value()
+        super().__init__(clkPin,dtPin, minV,maxV,reverse=True,range_mode=RotaryIRQ.RANGE_WRAP)
+       
+    def readValue(self):
+        self.count = self.value()
+        print('encoder ',self.count)
+        return self.count;
         
-        if(currCLK != self.lastCLK and currCLK == 1):
-            if(dt != currCLK):
-                self.count -= 1
-                self.count = maxV if self.count < minV else self.count
-                print('encoder ',self.count)
-                self.shouldRead = True
-            else:
-                self.count += 1
-                self.count = minV if self.count > maxV else self.count
-                print('encoder ',self.count)
-                self.shouldRead = True
-        
-        self.lastCLK = self.CLK.value()
+            

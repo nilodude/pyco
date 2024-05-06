@@ -6,7 +6,7 @@ from button import PixelButton, RedButton, Encoder, PlayButton
 from output import *
 import time, random
 from neopixel import Neopixel
-
+from rotary_irq import RotaryIRQ
 # hay que estudiarse los bucles de clock_mod.py (https://github.com/Allen-Synthesis/EuroPi/blob/main/software/contrib/clock_mod.py#L248)
 # y la forma con la que define los objetos ClockOutput con funciones como setExternalClock y el voltaje de salida con PWM
 
@@ -74,7 +74,8 @@ buttonB = RedButton(3,2,1)
 buttonC = RedButton(7,4,2)
 buttonD = RedButton(5,6,3)
 
-encoder = Encoder(18,19,23)
+encoder = Encoder(18, 19, 23, 1,4)
+
 buttonPlay = PlayButton(21)
 
 PXLBTN_0=11   # ALT
@@ -170,18 +171,18 @@ elapsed = 0
 lastToggle=0
 outA.value(0)
 while(True):
-    encoder.readValue(1, 4)
-    values[4] = str(encoder.count)
+    
+    values[4] = str(encoder.value())
     now = time.ticks_ms()
-    if(selectedInput == 4 and encoder.shouldRead):
-        encoder.shouldRead = False
-        if(encoder.count > 2):
-            newFreq = 10 * encoder.count # hardcoded initial 10Hz clock
-            outA.freq(newFreq)
-        else:
-            newFreq = 2+int(10 / encoder.count)
+    if(selectedInput == 4):
+        if(encoder.value() > 2):
+            newFreq = 10 * encoder.value() # hardcoded initial 10Hz clock
             print(newFreq)
-            outA.freq(newFreq)
+#             outA.freq(newFreq)
+        else:
+            newFreq = 2+int(10 / encoder.value())
+            print(newFreq)
+#             outA.freq(newFreq)
         
     
     if 'adc' in globals():
@@ -205,9 +206,9 @@ while(True):
       
     for key in buttons:
         b = buttons[key]
-        if(b.btn.value() == 0):
+        if(hasattr(b, 'btn') and b.btn.value() == 0):
             b.clicked = True
-        elif(b.clicked == True):
+        elif(hasattr(b, 'clicked') and b.clicked == True):
             b.clicked = False
             if hasattr(b, 'type'):
                 if(b.type == 'red'):
@@ -225,7 +226,7 @@ while(True):
                     
                     if(key == '+-*/'):
                         selectedInput = 4  # hardcoded encoder count value
-                        outA.freq(outA.freq() * encoder.count)
+#                         outA.freq(outA.freq() * encoder.count)
                         
                     R = int(random.random()*50)
                     G = int(random.random()*50)
