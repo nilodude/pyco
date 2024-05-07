@@ -9,7 +9,16 @@ from neopixel import Neopixel
 from rotary_irq import RotaryIRQ
 # hay que estudiarse los bucles de clock_mod.py (https://github.com/Allen-Synthesis/EuroPi/blob/main/software/contrib/clock_mod.py#L248)
 # y la forma con la que define los objetos ClockOutput con funciones como setExternalClock y el voltaje de salida con PWM
-
+import rp2
+from machine import Pin
+@rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
+def pin_onoff():
+    wrap_target()
+    set(pins, 1)   # high
+    set(pins, 0)   # low
+    wrap()
+sm = rp2.StateMachine(0, pin_onoff, set_base=Pin(28))
+sm.active(1)
 
 ADS1115_ADDRESS = 0x48
 
@@ -45,7 +54,7 @@ resetIN = Pin(10, Pin.IN, Pin.PULL_UP)
 
 ststpOUT = Pin(15, Pin.OUT)
 
-outA = Pin(28)
+# outA = Pin(28)
 outB = Pin(27)
 outC = Pin(26)
 outD = Pin(25)
@@ -206,9 +215,9 @@ while(True):
       
     for key in buttons:
         b = buttons[key]
-        if(hasattr(b, 'btn') and b.btn.value() == 0):
+        if(b.btn.value() == 0):
             b.clicked = True
-        elif(hasattr(b, 'clicked') and b.clicked == True):
+        elif(b.clicked == True):
             b.clicked = False
             if hasattr(b, 'type'):
                 if(b.type == 'red'):
