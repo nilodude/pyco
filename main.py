@@ -17,12 +17,12 @@ def pin_onoff():
     set(pins, 1)   # high
     set(pins, 0)   # low
     wrap()
-sm = rp2.StateMachine(0, pin_onoff, set_base=Pin(28))
+sm = rp2.StateMachine(0, pin_onoff,freq=4000, set_base=Pin(4))  # outA para probar 
 sm.active(1)
 
 ADS1115_ADDRESS = 0x48
 
-i2c0 = I2C(0, scl=Pin(17), sda=Pin(16))
+i2c0 = I2C(0, scl=Pin(3), sda=Pin(2))
 addresses = i2c0.scan()
 
 if len(addresses)>0:
@@ -30,9 +30,9 @@ if len(addresses)>0:
     for a in addresses:
         print(hex(a))
     
-    print('setting up adc...')
-    adc = ADS1115(ADS1115_ADDRESS, i2c=i2c0)
-    adc.setMeasureMode(ADS1115_SINGLE)
+#     print('setting up adc...')
+#     adc = ADS1115(ADS1115_ADDRESS, i2c=i2c0)
+#     adc.setMeasureMode(ADS1115_SINGLE)
     
     print('setting up port expander...')
     mcp1 = MCP23017(i2c0, 0x20)
@@ -48,16 +48,16 @@ else:
 tim = Timer()
 tim2 = Timer()
 
-syncIN = Pin(9, Pin.IN, Pin.PULL_UP)
-presetIN = machine.ADC(29)
-resetIN = Pin(10, Pin.IN, Pin.PULL_UP)
+syncIN = Pin(22, Pin.IN, Pin.PULL_UP)
+presetIN = machine.ADC(47)
+resetIN = Pin(23, Pin.IN, Pin.PULL_UP)
 
-ststpOUT = Pin(15, Pin.OUT)
+ststpOUT = Pin(29, Pin.OUT)
 
-# outA = Pin(28)
-outB = Pin(27)
-outC = Pin(26)
-outD = Pin(25)
+# outA = Pin(4)
+outB = Pin(5)
+outC = Pin(6)
+outD = Pin(7)
 
 
 
