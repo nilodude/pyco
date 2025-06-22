@@ -11,14 +11,25 @@ from rotary_irq import RotaryIRQ
 # y la forma con la que define los objetos ClockOutput con funciones como setExternalClock y el voltaje de salida con PWM
 import rp2
 from machine import Pin
+
 @rp2.asm_pio(set_init=rp2.PIO.OUT_LOW)
 def pin_onoff():
-    wrap_target()
-    set(pins, 1)   # high
-    set(pins, 0)   # low
-    wrap()
-sm = rp2.StateMachine(0, pin_onoff,freq=4000, set_base=Pin(4))  # outA para probar 
-sm.active(1)
+    
+    set(pins, 1)
+    set(x, 31) [6]
+    label("delay_high")
+    nop() [29]
+    jmp(x_dec, "delay_high")
+    
+    
+    set(pins, 0)
+    set(x, 31) [6]
+    label("delay_low")
+    nop() [29]
+    jmp(x_dec, "delay_low")
+    
+outA = rp2.StateMachine(1, pin_onoff, freq=2000, set_base=Pin(28))
+outA.active(1)
 
 ADS1115_ADDRESS = 0x48
 
@@ -68,9 +79,9 @@ signals= {
         'RESET':resetIN,
     },
     'outputs': {
-#         'ST':ststpOUT,
-        'A':outA,
-#         'B':outB,
+        'ST':ststpOUT,
+#         'A':outA,
+        'B':outB,
 #         'C':outC,
 #         'D':outD
         }
@@ -157,12 +168,12 @@ def tick(timer):
 
 def ststp(timer):
     ststpOUT.toggle()
-    outA.toggle()
+#     outA.toggle()
     outB.toggle()
 
 
-tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
-tim2.init(freq=100, mode=Timer.PERIODIC, callback=ststp)
+# tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
+# tim2.init(freq=1, mode=Timer.PERIODIC, callback=ststp)
 
 def readChannel(channel,voltage = False):
     adc.setCompareChannels(channel)
@@ -178,7 +189,7 @@ def readChannel(channel,voltage = False):
 
 elapsed = 0
 lastToggle=0
-outA.value(0)
+# outA.value(0)
 while(True):
     
     values[4] = str(encoder.value())
