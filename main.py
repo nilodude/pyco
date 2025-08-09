@@ -30,7 +30,7 @@ outA.active(1)
 
 ADS1115_ADDRESS = 0x48
 
-i2c0 = I2C(0, scl=Pin(3), sda=Pin(2))
+i2c0 = I2C(1, scl=Pin(3), sda=Pin(2))
 addresses = i2c0.scan()
 
 if len(addresses)>0:
@@ -57,7 +57,7 @@ tim = Timer()
 tim2 = Timer()
 
 syncIN = Pin(22, Pin.IN, Pin.PULL_UP)
-presetIN = machine.ADC(47)
+# presetIN = machine.ADC(47)
 resetIN = Pin(23, Pin.IN, Pin.PULL_UP)
 
 ststpOUT = Pin(29, Pin.OUT)
@@ -72,7 +72,7 @@ outD = Pin(7)
 signals= {
     'inputs' :  {
         'SYNC':syncIN,
-        'PRESET':presetIN,
+#         'PRESET':presetIN,
         'RESET':resetIN,
     },
     'outputs': {
@@ -86,16 +86,16 @@ signals= {
 values = ["0","0","0","0","0"]
 selectedInput = 0
 
-buttonA = RedButton(1,0,0)
-buttonB = RedButton(3,2,1)
-buttonC = RedButton(7,4,2)
-buttonD = RedButton(5,6,3)
+buttonA = RedButton(13,8,0)
+buttonB = RedButton(16,14,1)
+buttonC = RedButton(20,17,2)
+buttonD = RedButton(18,19,3)
 
 encoder = Encoder(18, 19, 23, 1,4)
 
 buttonPlay = PlayButton(21)
 
-PXLBTN_0=11   # ALT
+PXLBTN_0=11   # SHIFT (previously ALT)
 PXLBTN_1=13   # CV
 PXLBTN_2=20   # PRESET
 PXLBTN_3=24   # TEMPO
