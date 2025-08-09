@@ -58,9 +58,13 @@ tim2 = Timer()
 
 print('setting up CV inputs...')
 syncIN = Pin(22, Pin.IN, Pin.PULL_UP)
-# presetIN = machine.ADC(47)
 resetIN = Pin(23, Pin.IN, Pin.PULL_UP)
+# presetIN = machine.ADC(47)
 
+# AIN = machine.ADC(46)
+# BIN = machine.ADC(45)
+# CIN = machine.ADC(44)
+# DIN = machine.ADC(43)
 
 print('setting up CV outputs...')
 auxOUT = Pin(29, Pin.OUT)
@@ -97,17 +101,17 @@ buttonD = RedButton(18,19,3)
 
 encoder = Encoder(25, 25, 24, 1,4)
 
-buttonPlay = PlayButton(29)
+# buttonPlay = RedButton(39,42,4)
 
 
 print('setting up PIXEL buttons...')
-PXLBTN_0=25   # SHIFT (previously ALT)
+PXLBTN_0=25   # 30 SHIFT (previously ALT)
 PXLBTN_1=28   # CV
-PXLBTN_2=26   # PRESET
-PXLBTN_3=24   # TEMPO
-PXLBTN_4=22   # CHANCE
-PXLBTN_5=14   # MUTE
-PXLBTN_6=12   # +*/-
+PXLBTN_2=25   # 34 PRESET
+PXLBTN_3=25   # 40 TEMPO
+PXLBTN_4=25   # 37 CHANCE
+PXLBTN_5=25   # 36 MUTE
+PXLBTN_6=25   # 31 +*/-
 
 shift = PixelButton('SHIFT',PXLBTN_0, 0)
 cv = PixelButton('CV',PXLBTN_1, 1)
@@ -121,7 +125,7 @@ buttons = {'A': buttonA,
            'B':buttonB,
            'C':buttonC,
            'D':buttonD,
-           'PLAY': buttonPlay,
+#            'PLAY': buttonPlay,
            'SHIFT':shift,
            'CV':cv,
            'PRESET':preset,
@@ -175,7 +179,7 @@ def ststp(timer):
 #     outB.toggle()
 
 
-# tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
+tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
 # tim2.init(freq=1, mode=Timer.PERIODIC, callback=ststp)
 
 # def readChannel(channel,voltage = False):
@@ -194,33 +198,20 @@ elapsed = 0
 lastToggle=0
 # outA.value(0)
 while(True):
+    now = time.ticks_ms()        
     
-    values[4] = str(encoder.value())
-    now = time.ticks_ms()
-    if(selectedInput == 4):
-        if(encoder.value() > 2):
-            newFreq = 10 * encoder.value() # hardcoded initial 10Hz clock
-            print(newFreq)
-#             outA.freq(newFreq)
-        else:
-            newFreq = 2+int(10 / encoder.value())
-            print(newFreq)
-#             outA.freq(newFreq)
+    inA= 6
         
-    
-    if 'adc' in globals():
-        inA= 1
+    values[0] = "{:d}".format(int(inA))
         
-        values[0] = "{:d}".format(int(inA*1000))
+    inB= 66
+    values[1] = "{:d}".format(int(inB))
         
-        inB= 1
-        values[1] = "{:d}".format(int(inB*1000))
+    inC= 666
+    values[2] = "{:d}".format(int(inC))
         
-        inC= 1
-        values[2] = "{:d}".format(int(inC*1000))
-        
-        inD= 1
-        values[3] = "{:d}".format(int(inD*1000))
+    inD= 66.6
+    values[3] = "{:d}".format(int(inD))
         
 #         print(values)
         
@@ -242,7 +233,6 @@ while(True):
                     
                     b.led.value(1)
                     selectedInput = b.index
-                    
                 elif(b.type == 'play'):
                     mcp1.portb.gpio ^= 0b01000000
                 elif(b.type == 'pxl'):
