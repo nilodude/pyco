@@ -3,3 +3,9 @@
 	-hay que ver ahora el ADC cómo está configurado en la PCB. qué voltajes tiene, etc, es curioso este dato:
 	(https://github.com/robert-hh/ads1x15?tab=readme-ov-file#connection )
 	"The ADS1X15 use a I2C interface. So SCL and SDA have to be connected as minimum. If in continuous mode the CPU shall be triggered, the ALERT/RDY pin has to be connected too, and obviously VDD, GND and the analogue input(2). You might also set the address pin to low (address = 72) or high (address = 73)."
+	
+	
+9/08/25:
+	-despues de 1 hora y PICO (jaja) intentando todo lo que dicen los "manuales":
+		sudo picotool reboot -u -F 
+		POR FIN ha puesto el cacharro en modo BOOTSEL y ya lo reconoce el Thonny para reinstalarle el micropython
