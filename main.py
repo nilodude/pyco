@@ -1,12 +1,9 @@
 from machine import Pin, PWM, Timer, I2C
 from mcp23017 import MCP23017
-from adc import *
 from numbers import *
 from button import PixelButton, RedButton, Encoder, PlayButton
-from output import *
 import time, random
 from neopixel import Neopixel
-from rotary_irq import RotaryIRQ
 # hay que estudiarse los bucles de clock_mod.py (https://github.com/Allen-Synthesis/EuroPi/blob/main/software/contrib/clock_mod.py#L248)
 # y la forma con la que define los objetos ClockOutput con funciones como setExternalClock y el voltaje de salida con PWM
 import rp2
@@ -28,7 +25,7 @@ def pin_onoff():
     nop() [29]
     jmp(x_dec, "delay_low")
     
-outA = rp2.StateMachine(1, pin_onoff, freq=2000, set_base=Pin(28))
+outA = rp2.StateMachine(1, pin_onoff, set_base=Pin(28))
 outA.active(1)
 
 ADS1115_ADDRESS = 0x48
@@ -175,17 +172,17 @@ def ststp(timer):
 # tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
 # tim2.init(freq=1, mode=Timer.PERIODIC, callback=ststp)
 
-def readChannel(channel,voltage = False):
-    adc.setCompareChannels(channel)
-    adc.startSingleMeasurement()
-    while adc.isBusy():
-        pass
-    if voltage:
-        value = adc.getResult_V()
-    else:
-        value = adc.getRawResult()
-    
-    return value
+# def readChannel(channel,voltage = False):
+#     adc.setCompareChannels(channel)
+#     adc.startSingleMeasurement()
+#     while adc.isBusy():
+#         pass
+#     if voltage:
+#         value = adc.getResult_V()
+#     else:
+#         value = adc.getRawResult()
+#     
+#     return value
 
 elapsed = 0
 lastToggle=0
@@ -206,17 +203,17 @@ while(True):
         
     
     if 'adc' in globals():
-        inA= readChannel(ADS1115_COMP_0_GND,True)
+        inA= 1
         
         values[0] = "{:d}".format(int(inA*1000))
         
-        inB= readChannel(ADS1115_COMP_1_GND,True)
+        inB= 1
         values[1] = "{:d}".format(int(inB*1000))
         
-        inC= readChannel(ADS1115_COMP_2_GND,True)
+        inC= 1
         values[2] = "{:d}".format(int(inC*1000))
         
-        inD= readChannel(ADS1115_COMP_3_GND,True)
+        inD= 1
         values[3] = "{:d}".format(int(inD*1000))
         
 #         print(values)
