@@ -25,25 +25,25 @@ def pin_onoff():
     nop() [29]
     jmp(x_dec, "delay_low")
     
-outA = rp2.StateMachine(1, pin_onoff, set_base=Pin(28))
-outA.active(1)
+# outA = rp2.StateMachine(1, pin_onoff, set_base=Pin(28))
+# outA.active(1)
 
 ADS1115_ADDRESS = 0x48
 
-i2c0 = I2C(1, scl=Pin(3), sda=Pin(2))
-addresses = i2c0.scan()
+i2c1 = I2C(1, scl=Pin(3), sda=Pin(2))
+addresses = i2c1.scan()
 
 if len(addresses)>0:
-    print('i2c0 devices on address:')
+    print('i2c1 devices on address:')
     for a in addresses:
         print(hex(a))
     
 #     print('setting up adc...')
-#     adc = ADS1115(ADS1115_ADDRESS, i2c=i2c0)
+#     adc = ADS1115(ADS1115_ADDRESS, i2c=i2c1)
 #     adc.setMeasureMode(ADS1115_SINGLE)
     
     print('setting up port expander...')
-    mcp1 = MCP23017(i2c0, 0x20)
+    mcp1 = MCP23017(i2c1, 0x20)
     mcp1.porta.mode = 0x00
     mcp1.portb.mode = 0x00
     mcp1.gpio = 0x0f00
@@ -56,13 +56,16 @@ else:
 tim = Timer()
 tim2 = Timer()
 
+print('setting up CV inputs...')
 syncIN = Pin(22, Pin.IN, Pin.PULL_UP)
 # presetIN = machine.ADC(47)
 resetIN = Pin(23, Pin.IN, Pin.PULL_UP)
 
-ststpOUT = Pin(29, Pin.OUT)
 
-# outA = Pin(4)
+print('setting up CV outputs...')
+auxOUT = Pin(29, Pin.OUT)
+
+outA = Pin(4)
 outB = Pin(5)
 outC = Pin(6)
 outD = Pin(7)
@@ -76,34 +79,37 @@ signals= {
         'RESET':resetIN,
     },
     'outputs': {
-        'ST':ststpOUT,
-#         'A':outA,
+        'AUX':auxOUT,
+        'A':outA,
         'B':outB,
-#         'C':outC,
-#         'D':outD
+        'C':outC,
+        'D':outD
         }
 }
 values = ["0","0","0","0","0"]
 selectedInput = 0
 
+print('setting up RED buttons...')
 buttonA = RedButton(13,8,0)
 buttonB = RedButton(16,14,1)
 buttonC = RedButton(20,17,2)
 buttonD = RedButton(18,19,3)
 
-encoder = Encoder(18, 19, 23, 1,4)
+encoder = Encoder(25, 25, 24, 1,4)
 
-buttonPlay = PlayButton(21)
+buttonPlay = PlayButton(29)
 
-PXLBTN_0=11   # SHIFT (previously ALT)
-PXLBTN_1=13   # CV
-PXLBTN_2=20   # PRESET
+
+print('setting up PIXEL buttons...')
+PXLBTN_0=25   # SHIFT (previously ALT)
+PXLBTN_1=28   # CV
+PXLBTN_2=26   # PRESET
 PXLBTN_3=24   # TEMPO
 PXLBTN_4=22   # CHANCE
 PXLBTN_5=14   # MUTE
 PXLBTN_6=12   # +*/-
 
-alt = PixelButton('ALT',PXLBTN_0, 0)
+shift = PixelButton('SHIFT',PXLBTN_0, 0)
 cv = PixelButton('CV',PXLBTN_1, 1)
 preset = PixelButton('PRESET',PXLBTN_2, 2)
 tempo = PixelButton('TEMPO',PXLBTN_3, 3)
@@ -116,7 +122,7 @@ buttons = {'A': buttonA,
            'C':buttonC,
            'D':buttonD,
            'PLAY': buttonPlay,
-           'ALT':alt,
+           'SHIFT':shift,
            'CV':cv,
            'PRESET':preset,
            'TEMPO':tempo,
@@ -164,9 +170,9 @@ def tick(timer):
     show(values[selectedInput])
 
 def ststp(timer):
-    ststpOUT.toggle()
-#     outA.toggle()
-    outB.toggle()
+#     ststpOUT.toggle()
+    outA.toggle()
+#     outB.toggle()
 
 
 # tim.init(freq=35, mode=Timer.PERIODIC, callback=tick)
